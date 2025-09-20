@@ -1,0 +1,96 @@
+{
+  "availableRoutes": [
+    {
+      "name": "Dashboard",
+      "title": "产品中心",
+      "path": "/dashboard",
+      "component": "Dashboard/index",
+      "description": "产品展示和管理中心",
+      "category": "核心功能"
+    },
+    {
+      "name": "Analysis",
+      "title": "产品展示",
+      "path": "/dashboard/analysis",
+      "component": "Analysis/index",
+      "description": "产品数据分析和展示",
+      "category": "核心功能",
+      "parent": "Dashboard"
+    },
+    {
+      "name": "UserManagement",
+      "title": "用户管理",
+      "path": "/user-management",
+      "component": "UserManagement/index",
+      "description": "系统用户账户管理",
+      "category": "管理功能"
+    },
+    {
+      "name": "Data",
+      "title": "数据中心",
+      "path": "/data",
+      "component": "Data/index",
+      "description": "数据存储和管理中心",
+      "category": "数据功能"
+    },
+    {
+      "name": "DataPanel",
+      "title": "数据面板",
+      "path": "/dataPanel",
+      "component": "DataPanel/index",
+      "description": "数据可视化面板",
+      "category": "数据功能"
+    },
+    {
+      "name": "Devices",
+      "title": "设备管理",
+      "path": "/devices",
+      "component": "Devices/index",
+      "description": "设备管理中心",
+      "category": "数据功能"
+    },
+    {
+      "name": "Profile",
+      "title": "个人资料",
+      "path": "/profile",
+      "component": "Profile/index",
+      "description": "用户个人信息管理",
+      "category": "基础功能"
+    },
+    {
+      "name": "DevicesMap",
+      "title": "设备地图",
+      "path": "/devicesMap",
+      "component": "DevicesMap/index",
+      "description": "设备地图展示",
+      "category": "数据功能"
+    }
+  ],
+  "userRoutePermissions": {
+    "admin": [
+      "Dashboard",
+      "Analysis",
+      "UserManagement",
+      "Profile"
+    ],
+    "user": [
+      "Dashboard",
+      "Profile",
+      "UserManagement"
+    ],
+    "guest": [
+      "Data",
+      "DataPanel",
+      "Devices",
+      "Dashboard",
+      "Analysis",
+      "UserManagement",
+      "Profile",
+      "DevicesMap"
+    ]
+  },
+  "defaultPermissions": [
+    "Profile"
+  ],
+  "lastUpdated": "2025-09-05T00:00:00.000Z"
+}

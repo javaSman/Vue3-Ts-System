@@ -1,0 +1,61 @@
+{
+  "users": {
+    "admin": {
+      "id": 1,
+      "username": "admin",
+      "password": "admin123",
+      "email": "admin@example.com",
+      "permissions": [
+        "admin"
+      ],
+      "status": "active",
+      "registeredAt": "2025-06-19",
+      "profile": {
+        "fullName": "曾女士",
+        "phone": "13692774696",
+        "bio": "",
+        "avatar": "",
+        "twoFactorEnabled": false,
+        "lastPasswordChange": "2025-09-04"
+      }
+    },
+    "user": {
+      "id": 2,
+      "username": "user",
+      "password": "user123",
+      "email": "user@example.com",
+      "permissions": [],
+      "status": "inactive",
+      "registeredAt": "2024-12-26",
+      "profile": {
+        "fullName": "谭女士",
+        "phone": "19849589640",
+        "bio": "",
+        "avatar": "",
+        "twoFactorEnabled": false,
+        "lastPasswordChange": "2025-09-04"
+      }
+    },
+    "guest": {
+      "id": 3,
+      "username": "guest",
+      "password": "21693",
+      "email": "guest@example.com",
+      "permissions": [
+        "guest"
+      ],
+      "status": "active",
+      "registeredAt": "2025-09-04",
+      "profile": {
+        "fullName": "李先生",
+        "phone": "15768789265",
+        "bio": "",
+        "avatar": "",
+        "twoFactorEnabled": false,
+        "lastPasswordChange": "2025-09-04"
+      }
+    }
+  },
+  "userIdCounter": 4,
+  "lastUpdated": "2025-09-11T11:17:52.790Z"
+}
