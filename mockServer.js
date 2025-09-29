@@ -3,9 +3,46 @@ import express from 'express';
 import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
+import multer from 'multer';
 
 const app = express();
 const port = 3001;
+
+// 创建上传目录
+const UPLOAD_DIR = path.join(process.cwd(), 'uploads', 'avatars');
+if (!fs.existsSync(UPLOAD_DIR)) {
+    fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+    console.log('📁 创建头像上传目录:', UPLOAD_DIR);
+}
+
+// 配置multer用于文件上传
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, UPLOAD_DIR);
+    },
+    filename: function (req, file, cb) {
+        // 生成唯一文件名: userId_timestamp.ext
+        const userId = req.params.userId;
+        const timestamp = Date.now();
+        const ext = path.extname(file.originalname);
+        cb(null, `avatar_${userId}_${timestamp}${ext}`);
+    }
+});
+
+const upload = multer({
+    storage: storage,
+    limits: {
+        fileSize: 2 * 1024 * 1024 // 2MB
+    },
+    fileFilter: function (req, file, cb) {
+        // 只允许图片文件
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('只允许上传图片文件'));
+        }
+    }
+});
 
 // 启用 CORS - 配置更详细的选项
 app.use(cors({
@@ -13,6 +50,9 @@ app.use(cors({
     credentials: true
 }));
 app.use(express.json());
+
+// 静态文件服务 - 提供头像访问
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // 数据文件路径
 const DATA_FILE = path.join(process.cwd(), 'userData.json');
@@ -160,9 +200,9 @@ function loadUsers() {
     console.log('📝 使用默认用户数据');
     return {
         users: {
-            admin: { id: 1, username: 'admin', password: 'admin123', email: 'admin@example.com', permissions: ['admin'], status: 'active', registeredAt: '2023-01-01', profile: { fullName: '系统管理员', phone: '13800138001', bio: '系统管理员账户，负责系统整体管理和维护', avatar: '', twoFactorEnabled: false, lastPasswordChange: '2024-01-15' } },
-            user: { id: 2, username: 'user', password: 'user123', email: 'user@example.com', permissions: [], status: 'active', registeredAt: '2023-01-01', profile: { fullName: '普通用户', phone: '13800138002', bio: '普通用户账户', avatar: '', twoFactorEnabled: false, lastPasswordChange: '2024-01-10' } },
-            guest: { id: 3, username: 'guest', password: '21693', email: 'guest@example.com', permissions: ['admin'], status: 'active', registeredAt: '2023-01-01', profile: { fullName: '访客用户', phone: '13800138003', bio: '访客用户账户，拥有管理员权限', avatar: '', twoFactorEnabled: true, lastPasswordChange: '2024-01-20' } }
+            admin: { id: 1, username: 'admin', password: 'admin123', email: 'admin@example.com', permissions: ['admin'], status: 'active', registeredAt: '2023-01-01', profile: { fullName: '系统管理员', phone: '13800138001', bio: '系统管理员账户，负责系统整体管理和维护', avatar: '', avatarUrl: '', twoFactorEnabled: false, lastPasswordChange: '2024-01-15' } },
+            user: { id: 2, username: 'user', password: 'user123', email: 'user@example.com', permissions: [], status: 'active', registeredAt: '2023-01-01', profile: { fullName: '普通用户', phone: '13800138002', bio: '普通用户账户', avatar: '', avatarUrl: '', twoFactorEnabled: false, lastPasswordChange: '2024-01-10' } },
+            guest: { id: 3, username: 'guest', password: '21693', email: 'guest@example.com', permissions: ['admin'], status: 'active', registeredAt: '2023-01-01', profile: { fullName: '访客用户', phone: '13800138003', bio: '访客用户账户，拥有管理员权限', avatar: '', avatarUrl: '', twoFactorEnabled: true, lastPasswordChange: '2024-01-20' } }
         },
         userIdCounter: 4
     };
@@ -462,7 +502,8 @@ app.post('/api/users', (req, res) => {
                 fullName: '',
                 phone: '',
                 bio: '',
-                avatar: '',
+                avatarUrl: '',
+                avatarUrl: '',
                 twoFactorEnabled: false,
                 lastPasswordChange: new Date().toISOString().split('T')[0]
             }
@@ -1411,7 +1452,8 @@ app.get('/api/profile/:userId', (req, res) => {
                 fullName: '',
                 phone: '',
                 bio: '',
-                avatar: '',
+                avatarUrl: '',
+                avatarUrl: '',
                 twoFactorEnabled: false,
                 lastPasswordChange: targetUser.registeredAt || new Date().toISOString().split('T')[0]
             };
@@ -1505,7 +1547,7 @@ app.put('/api/profile/:userId', (req, res) => {
                 fullName: '',
                 phone: '',
                 bio: '',
-                avatar: '',
+                avatarUrl: '',
                 twoFactorEnabled: false,
                 lastPasswordChange: targetUser.registeredAt || new Date().toISOString().split('T')[0]
             };
@@ -1558,6 +1600,198 @@ app.put('/api/profile/:userId', (req, res) => {
         res.status(500).json({
             success: false,
             message: '更新用户资料失败',
+            error: error.message
+        });
+    }
+});
+
+// 上传用户头像API - 真实文件上传
+app.post('/api/profile/:userId/avatar', upload.single('avatar'), (req, res) => {
+    try {
+        const userId = parseInt(req.params.userId);
+        console.log('📸 收到头像上传请求，用户ID:', userId);
+
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                message: '未选择文件'
+            });
+        }
+
+        // 查找用户
+        let targetUser = null;
+        for (const user of Object.values(users)) {
+            if (user.id === userId) {
+                targetUser = user;
+                break;
+            }
+        }
+
+        if (!targetUser) {
+            // 删除已上传的文件
+            fs.unlinkSync(req.file.path);
+            return res.status(404).json({
+                success: false,
+                message: '用户不存在'
+            });
+        }
+
+        // 删除旧头像文件（如果存在）
+        if (targetUser.profile?.avatarUrl && targetUser.profile.avatarUrl.startsWith('/uploads/')) {
+            const oldAvatarPath = path.join(process.cwd(), targetUser.profile.avatarUrl);
+            if (fs.existsSync(oldAvatarPath)) {
+                try {
+                    fs.unlinkSync(oldAvatarPath);
+                    console.log('🗑️ 已删除旧头像文件:', oldAvatarPath);
+                } catch (error) {
+                    console.warn('⚠️ 删除旧头像文件失败:', error.message);
+                }
+            }
+        }
+
+        // 生成头像URL
+        const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+        const fullAvatarUrl = `http://localhost:${port}${avatarUrl}`;
+
+        // 确保profile对象存在
+        if (!targetUser.profile) {
+            targetUser.profile = {
+                fullName: '',
+                phone: '',
+                bio: '',
+                avatar: '',
+                avatarUrl: '',
+                twoFactorEnabled: false,
+                lastPasswordChange: targetUser.registeredAt || new Date().toISOString().split('T')[0]
+            };
+        }
+
+        // 更新头像
+        targetUser.profile.avatar = fullAvatarUrl;
+        targetUser.profile.avatarUrl = fullAvatarUrl;
+
+        // 保存到文件
+        const saveSuccess = saveUsers();
+        if (!saveSuccess) {
+            console.warn('⚠️ 用户数据保存失败，但头像上传仍然成功（仅在内存中）');
+        }
+
+        console.log('\n✅ 用户头像上传成功!');
+        console.log('📋 头像上传信息:');
+        console.log(`   用户ID: ${userId}`);
+        console.log(`   用户名: ${targetUser.username}`);
+        console.log(`   文件名: ${req.file.filename}`);
+        console.log(`   文件大小: ${(req.file.size / 1024).toFixed(2)}KB`);
+        console.log(`   头像URL: ${fullAvatarUrl}`);
+        console.log(`   更新时间: ${new Date().toISOString()}`);
+        console.log('='.repeat(60));
+
+        res.json({
+            success: true,
+            message: '头像上传成功',
+            data: {
+                avatarUrl: fullAvatarUrl,
+                userId: userId,
+                filename: req.file.filename,
+                size: req.file.size
+            }
+        });
+
+    } catch (error) {
+        console.error('上传头像错误:', error);
+
+        // 如果有文件上传，删除它
+        if (req.file && fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path);
+        }
+
+        res.status(500).json({
+            success: false,
+            message: '上传头像失败',
+            error: error.message
+        });
+    }
+});
+
+// 保留原有的PUT方法作为备用API
+app.put('/api/profile/:userId/avatar', (req, res) => {
+    try {
+        const userId = parseInt(req.params.userId);
+        console.log('📸 上传用户头像（URL方式），用户ID:', userId);
+
+        const { avatarUrl } = req.body;
+
+        // 输入验证
+        if (!avatarUrl) {
+            return res.status(400).json({
+                success: false,
+                message: '头像URL不能为空'
+            });
+        }
+
+        // 查找用户
+        let targetUser = null;
+        for (const user of Object.values(users)) {
+            if (user.id === userId) {
+                targetUser = user;
+                break;
+            }
+        }
+
+        if (!targetUser) {
+            return res.status(404).json({
+                success: false,
+                message: '用户不存在'
+            });
+        }
+
+        // 确保profile对象存在
+        if (!targetUser.profile) {
+            targetUser.profile = {
+                fullName: '',
+                phone: '',
+                bio: '',
+                avatar: '',
+                avatarUrl: '',
+                twoFactorEnabled: false,
+                lastPasswordChange: targetUser.registeredAt || new Date().toISOString().split('T')[0]
+            };
+        }
+
+        // 更新头像
+        const oldAvatar = targetUser.profile.avatar;
+        targetUser.profile.avatar = avatarUrl;
+        targetUser.profile.avatarUrl = avatarUrl; // 同时设置avatarUrl字段以保持兼容性
+
+        // 保存到文件
+        const saveSuccess = saveUsers();
+        if (!saveSuccess) {
+            console.warn('⚠️ 头像保存失败，但更新仍然成功（仅在内存中）');
+        }
+
+        console.log('\n✅ 用户头像上传成功!');
+        console.log('📝 头像更新信息:');
+        console.log(`   用户ID: ${userId}`);
+        console.log(`   用户名: ${targetUser.username}`);
+        console.log(`   旧头像: ${oldAvatar || '无'}`);
+        console.log(`   新头像: ${avatarUrl}`);
+        console.log(`   更新时间: ${new Date().toISOString()}`);
+        console.log('='.repeat(60));
+
+        res.json({
+            success: true,
+            message: '头像上传成功',
+            data: {
+                avatarUrl: avatarUrl,
+                userId: userId
+            }
+        });
+
+    } catch (error) {
+        console.error('上传头像错误:', error);
+        res.status(500).json({
+            success: false,
+            message: '上传头像失败',
             error: error.message
         });
     }
@@ -1619,9 +1853,10 @@ app.put('/api/profile/:userId/password', (req, res) => {
                 fullName: '',
                 phone: '',
                 bio: '',
-                avatar: '',
+                avatarUrl: '',
+                avatarUrl: '',
                 twoFactorEnabled: false,
-                lastPasswordChange: new Date().toISOString().split('T')[0]
+                lastPasswordChange: targetUser.registeredAt || new Date().toISOString().split('T')[0]
             };
         } else {
             targetUser.profile.lastPasswordChange = new Date().toISOString().split('T')[0];
@@ -1676,6 +1911,8 @@ app.listen(port, () => {
     console.log(`   DELETE /api/users/:userId - 删除指定用户`);
     console.log(`   GET  /api/profile/:userId - 获取用户个人资料`);
     console.log(`   PUT  /api/profile/:userId - 更新用户个人资料`);
+    console.log(`   PUT  /api/profile/:userId/avatar - 上传用户头像（URL方式）`);
+    console.log(`   POST /api/profile/:userId/avatar - 上传用户头像（文件方式）`);
     console.log(`   PUT  /api/profile/:userId/password - 修改用户密码`);
     console.log(`   GET  /api/user/:userId/routes - 获取用户路由`);
     console.log(`   GET  /api/activity  - 获取最近活动`);

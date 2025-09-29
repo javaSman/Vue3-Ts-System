@@ -10,8 +10,8 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
 
-const title = ref < string > ('Hello World');
-const sum = ref < number > (0);
+const title = ref<string>('Hello World');
+const sum = ref<number>(0);
 
 // 页面加载时从localStorage读取保存的值
 onMounted(() => {

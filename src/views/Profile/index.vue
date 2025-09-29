@@ -187,7 +187,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useAuthStore } from '@/stores/auth';
-import { fetchUserProfile, updateUserProfile, changeUserPassword } from '@/api/profile';
+import { fetchUserProfile, updateUserProfile, changeUserPassword, uploadUserAvatarFile } from '@/api/profile';
 
 interface UserForm {
   username: string;
@@ -310,7 +310,7 @@ function handleFileSelect(event: Event) {
   };
   reader.readAsDataURL(file);
 
-  showMessage('头像已选择，请点击确认使用', 'success');
+  // showMessage('头像已选择，请点击确认使用', 'success');
 }
 
 // 确认使用头像
@@ -319,16 +319,24 @@ async function confirmAvatar() {
 
   avatarUploading.value = true;
   try {
-    const result = await uploadAvatar(avatarFile.value);
+    console.log('📸 开始上传头像文件...', avatarFile.value.name);
+
+    // 使用新的文件上传API
+    const result = await uploadUserAvatarFile(authStore.userInfo!.id, avatarFile.value);
+
+    console.log('📋 头像上传API响应:', result);
 
     if (result.success) {
       showMessage('头像上传成功！');
-      avatarUrl.value = result.data?.avatarUrl || URL.createObjectURL(avatarFile.value);
-      currentAvatar.value = result.data?.avatarUrl || URL.createObjectURL(avatarFile.value);
+      avatarUrl.value = result.data?.avatarUrl || null;
+      currentAvatar.value = result.data?.avatarUrl || null;
       previewAvatar.value = null;
       avatarFile.value = null;
 
+      // 重新加载用户资料以获取最新数据
       await loadUserProfile();
+
+      console.log('✅ 头像上传完成，文件大小:', result.data?.size, 'bytes');
     } else {
       showMessage(result.message || '头像上传失败', 'error');
     }
@@ -344,31 +352,9 @@ async function confirmAvatar() {
 function cancelPreview() {
   previewAvatar.value = null;
   avatarFile.value = null;
-}
-
-// 上传头像的 API 调用函数
-async function uploadAvatar(file: File): Promise<AvatarUploadResponse> {
-  const formData = new FormData();
-  formData.append('avatar', file);
-
-  try {
-    const localUrl = URL.createObjectURL(file);
-
-    return {
-      success: true,
-      data: {
-        avatarUrl: localUrl
-      }
-    };
-  } catch (error) {
-    console.error('上传头像 API 调用失败:', error);
-    const localUrl = URL.createObjectURL(file);
-    return {
-      success: true,
-      data: {
-        avatarUrl: localUrl
-      }
-    };
+  // 清理文件输入框
+  if (fileInputRef.value) {
+    fileInputRef.value.value = '';
   }
 }
 
@@ -397,9 +383,16 @@ async function loadUserProfile() {
       twoFactorEnabled.value = result.data.profile.twoFactorEnabled || false;
       lastPasswordChange.value = result.data.profile.lastPasswordChange || '';
 
-      if (result.data.profile.avatarUrl) {
-        currentAvatar.value = result.data.profile.avatarUrl;
-        avatarUrl.value = result.data.profile.avatarUrl;
+      // 设置头像URL，优先使用avatarUrl，其次使用avatar
+      const profileAvatarUrl = result.data.profile.avatarUrl || result.data.profile.avatar;
+      if (profileAvatarUrl) {
+        currentAvatar.value = profileAvatarUrl;
+        avatarUrl.value = profileAvatarUrl;
+        console.log('✅ 头像加载成功:', profileAvatarUrl);
+      } else {
+        currentAvatar.value = null;
+        avatarUrl.value = null;
+        console.log('📝 用户未设置头像');
       }
 
       console.log('✅ 用户资料加载成功');

@@ -18,7 +18,7 @@ export async function fetchUserProfile(userId: number): Promise<{
             avatar: string;
             twoFactorEnabled: boolean;
             lastPasswordChange: string;
-            avatarUrl: string
+            avatarUrl: string;
         };
     };
     message?: string;
@@ -60,6 +60,69 @@ export async function updateUserProfile(userId: number, profileData: {
             return {
                 success: false,
                 message: error.response.data.message || '更新用户资料失败'
+            };
+        }
+        return {
+            success: false,
+            message: '网络错误，请稍后重试'
+        };
+    }
+}
+
+// 上传用户头像 - 文件上传方式
+export async function uploadUserAvatarFile(userId: number, file: File): Promise<{
+    success: boolean;
+    message: string;
+    data?: {
+        avatarUrl: string;
+        userId: number;
+        filename: string;
+        size: number;
+    };
+}> {
+    try {
+        const formData = new FormData();
+        formData.append('avatar', file);
+
+        const response = await axiosInstance.post(`/profile/${userId}/avatar`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        return response.data;
+    } catch (error: any) {
+        if (error.response && error.response.data) {
+            return {
+                success: false,
+                message: error.response.data.message || '头像上传失败'
+            };
+        }
+        return {
+            success: false,
+            message: '网络错误，请稍后重试'
+        };
+    }
+}
+
+// 上传用户头像 - URL方式（保留兼容）
+export async function uploadUserAvatar(userId: number, avatarUrl: string): Promise<{
+    success: boolean;
+    message: string;
+    data?: {
+        avatarUrl: string;
+        userId: number;
+    };
+}> {
+    try {
+        const response = await axiosInstance.put(`/profile/${userId}/avatar`, {
+            avatarUrl
+        });
+        return response.data;
+    } catch (error: any) {
+        if (error.response && error.response.data) {
+            return {
+                success: false,
+                message: error.response.data.message || '头像上传失败'
             };
         }
         return {
