@@ -64,6 +64,14 @@
       "component": "DevicesMap/index",
       "description": "设备地图展示",
       "category": "数据功能"
+    },
+    {
+      "name": "AuditLogs",
+      "title": "操作日志",
+      "path": "/audit-logs",
+      "component": "AuditLogs/index",
+      "description": "系统操作日志审计",
+      "category": "管理功能"
     }
   ],
   "userRoutePermissions": {
@@ -71,7 +79,8 @@
       "Dashboard",
       "Analysis",
       "UserManagement",
-      "Profile"
+      "Profile",
+      "AuditLogs"
     ],
     "user": [
       "Dashboard",
@@ -79,13 +88,14 @@
       "UserManagement"
     ],
     "guest": [
-      "Data",
       "DataPanel",
+      "Data",
       "Devices",
+      "UserManagement",
+      "AuditLogs",
+      "Profile",
       "Dashboard",
       "Analysis",
-      "UserManagement",
-      "Profile",
       "DevicesMap"
     ]
   },

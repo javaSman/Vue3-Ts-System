@@ -5,6 +5,7 @@ import type { UserInfo } from '@/types/router';
 import { fetchUserRoutes } from '@/api/auth';
 import { convertRoutes } from '@/utils/routeConverter';
 import router from '@/router';
+import axiosInstance from '@/services/axiosInstance';
 
 interface AuthState {
     isAuthenticated: boolean;
@@ -30,35 +31,25 @@ export const useAuthStore = defineStore('auth', {
             try {
                 console.log('开始登录:', username);
 
-                // 使用相对路径，让 Vite 代理处理
-                const response = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ username, password })
+                // 使用axios实例发起登录请求
+                const response = await axiosInstance.post('/login', {
+                    username,
+                    password
                 });
 
-                console.log('登录请求响应状态:', response.status, response.statusText);
+                console.log('登录响应数据:', response.data);
 
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    console.error('登录请求失败:', {
-                        status: response.status,
-                        statusText: response.statusText,
-                        errorData
-                    });
-                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-                }
+                if (response.data.success) {
+                    // 保存token到localStorage
+                    if (response.data.token) {
+                        localStorage.setItem('authToken', response.data.token);
+                        console.log('保存token成功:', response.data.token);
+                    }
 
-                const data = await response.json();
-                console.log('登录响应数据:', data);
-
-                if (data.success) {
                     // 更新认证状态
                     this.isAuthenticated = true;
-                    this.userId = data.userId;
-                    this.userInfo = data.userInfo;
+                    this.userId = response.data.userId;
+                    this.userInfo = response.data.userInfo;
 
                     // 异步加载动态路由，不阻塞登录
                     (this as any).loadDynamicRoutes().catch((error: unknown) => {
@@ -68,9 +59,9 @@ export const useAuthStore = defineStore('auth', {
                     console.log('登录成功');
                     return true; // 明确返回 true
                 } else {
-                    throw new Error(data.message || '登录失败');
+                    throw new Error(response.data.message || '登录失败');
                 }
-            } catch (error) {
+            } catch (error: any) {
                 console.error('登录错误:', error);
                 // 返回 false 而不是抛出错误，让调用方处理
                 return false;
@@ -133,6 +124,10 @@ export const useAuthStore = defineStore('auth', {
         },
 
         logout() {
+            // 清除token
+            localStorage.removeItem('authToken');
+            console.log('已清除token');
+            
             this.isAuthenticated = false;
             this.userId = 0;
             this.userInfo = null;

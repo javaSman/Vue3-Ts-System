@@ -466,109 +466,167 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
-import { fetchAvailablePermissions, fetchUserRoutePermissions, updateUserRoutePermissions } from '@/api/permissions';
-import { fetchUsers, deleteUser as apiDeleteUser, updateUser as apiUpdateUser, createUser as apiCreateUser } from '@/api/userManagement';
+import {
+  fetchAvailablePermissions,
+  fetchUserRoutePermissions,
+  updateUserRoutePermissions
+} from '@/api/permissions';
+import {
+  fetchUsers,
+  deleteUser as apiDeleteUser,
+  updateUser as apiUpdateUser,
+  createUser as apiCreateUser
+} from '@/api/userManagement';
 import { useAuthStore } from '@/stores/auth';
 
+// 定义用户接口类型 - 明确包含status属性
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  role: 'user' | 'admin' | 'guest';
+  status: 'active' | 'inactive'; // 确保包含status
+  registeredAt?: string;
+  permissions?: string[]; // API返回的权限数组
+}
+
+// 定义权限接口类型 - 使category成为可选，并处理其他可能字段
+interface Permission {
+  name: string;
+  title: string;
+  category?: string | undefined; // 明确category为可选
+  path?: string;
+  description?: string;
+  component?: string;
+  parent?: string;
+}
+
+// 定义API响应接口类型
+interface ApiResponse<T = any> {
+  success: boolean;
+  message?: string;
+  data?: T;
+}
+
+// 定义用户表单数据接口
+interface UserData {
+  username: string;
+  email: string;
+  password: string;
+  role: 'user' | 'admin' | 'guest';
+  status: 'active' | 'inactive';
+  routePermissions?: string[];
+}
+
 // 响应式状态
-const users = ref([]);
-const loading = ref(false);
-const addLoading = ref(false);
-const editLoading = ref(false);
-const deleteLoading = ref(false);
+const users = ref<User[]>([]);
+const loading = ref<boolean>(false);
+const addLoading = ref<boolean>(false);
+const editLoading = ref<boolean>(false);
+const deleteLoading = ref<boolean>(false);
 
 // 权限相关
 const authStore = useAuthStore();
-const availablePermissions = ref([]);
-const permissionsLoading = ref(false);
+const availablePermissions = ref<Permission[]>([]);
+const permissionsLoading = ref<boolean>(false);
 
-// 检查是否为超级管理员 (guest)
+// 检查是否为超级管理员
 const isSuperAdmin = computed(() => {
   return authStore.userInfo?.username === 'guest';
 });
 
 // 搜索和过滤
-const searchKeyword = ref('');
-const roleFilter = ref('');
-const statusFilter = ref('');
+const searchKeyword = ref<string>('');
+const roleFilter = ref<string>('');
+const statusFilter = ref<string>('');
 
 // 排序
-const sortField = ref('id');
-const sortDirection = ref('asc');
+const sortField = ref<string>('id');
+const sortDirection = ref<string>('asc');
 
 // 分页
-const currentPage = ref(1);
-const pageSize = ref(10);
+const currentPage = ref<number>(1);
+const pageSize = ref<number>(10);
 
 // 对话框状态
-const showAddDialog = ref(false);
-const showEditDialog = ref(false);
-const showDeleteDialog = ref(false);
-const showPermissionDialog = ref(false); // 新增：权限查看/管理弹窗
+const showAddDialog = ref<boolean>(false);
+const showEditDialog = ref<boolean>(false);
+const showDeleteDialog = ref<boolean>(false);
+const showPermissionDialog = ref<boolean>(false);
 
 // 表单数据
-const newUser = ref({
+const newUser = ref<UserData>({
   username: '',
   email: '',
   password: '',
   role: 'user',
   status: 'active',
-  routePermissions: [] // 新增：路由权限列表
+  routePermissions: []
 });
 
-const editingUser = ref({
-  id: null,
+// 修复编辑用户类型问题
+const editingUser = ref<{
+  id: number;
+  username: string;
+  email: string;
+  role: 'user' | 'admin' | 'guest';
+  status: 'active' | 'inactive';
+}>({
+  id: 0,
   username: '',
   email: '',
-  role: '',
-  status: ''
+  role: 'user',
+  status: 'active'
 });
 
-const userToDelete = ref(null);
+const userToDelete = ref<User | null>(null);
 
 // 权限管理相关状态
-const permissionUser = ref(null); // 当前查看权限的用户
-const userPermissions = ref([]); // 用户当前权限
-const allPermissions = ref([]); // 所有可用权限
-const permissionLoading = ref(false); // 加载状态
-const permissionSaving = ref(false); // 保存状态
-const tempSelectedPermissions = ref([]); // 临时选中的权限（编辑模式下）
-// 处理权限选择变化 - 修复版本
-function handlePermissionChange(permissionName, event) {
-  const isChecked = event.target.checked;
+const permissionUser = ref<User | null>(null);
+const userPermissions = ref<Permission[]>([]);
+const allPermissions = ref<Permission[]>([]);
+const permissionLoading = ref<boolean>(false);
+const permissionSaving = ref<boolean>(false);
+const tempSelectedPermissions = ref<string[]>([]);
+
+// 安全访问用户属性的函数
+function getUserProperty<T extends keyof User>(user: User, key: T): User[T] {
+  return user[key];
+}
+
+// 处理权限选择变化
+function handlePermissionChange(permissionName: string, event: Event): void {
+  const target = event.target as HTMLInputElement;
+  const isChecked = target.checked;
 
   if (isChecked) {
-    // 添加到选中列表的末尾
     if (!tempSelectedPermissions.value.includes(permissionName)) {
       tempSelectedPermissions.value.push(permissionName);
     }
   } else {
-    // 从选中列表中移除
     const index = tempSelectedPermissions.value.indexOf(permissionName);
     if (index > -1) {
       tempSelectedPermissions.value.splice(index, 1);
     }
   }
 
-  // 强制更新视图
   tempSelectedPermissions.value = [...tempSelectedPermissions.value];
 }
 
 // 获取权限的选中顺序
-function getPermissionOrder(permissionName) {
+function getPermissionOrder(permissionName: string): number {
   const index = tempSelectedPermissions.value.indexOf(permissionName);
   return index > -1 ? index + 1 : 0;
 }
 
 // 获取权限顺序样式
-function getPermissionOrderStyle(permissionName) {
+function getPermissionOrderStyle(permissionName: string): { [key: string]: string } {
   const index = tempSelectedPermissions.value.indexOf(permissionName);
   if (index === -1) return {};
 
-  // 根据选中顺序设置不同的背景色
-  const hue = (index * 30) % 360; // 每个选项不同的色调
+  const hue = (index * 30) % 360;
   return {
     '--order-color': `hsl(${hue}, 70%, 90%)`,
     '--order-border-color': `hsl(${hue}, 70%, 70%)`
@@ -576,7 +634,7 @@ function getPermissionOrderStyle(permissionName) {
 }
 
 // 获取顺序提示文本
-function getOrderHint() {
+function getOrderHint(): string {
   if (tempSelectedPermissions.value.length === 0) {
     return '无选中权限';
   }
@@ -588,76 +646,111 @@ function getOrderHint() {
 }
 
 // 消息提示
-const message = ref({
+const message = ref<{
+  show: boolean;
+  text: string;
+  type: 'success' | 'error' | 'warning' | 'info';
+}>({
   show: false,
   text: '',
   type: 'info'
 });
 
-// 计算属性
-const filteredUsers = computed(() => {
+// 计算属性 - 修复索引访问问题和未定义值问题
+const filteredUsers = computed<User[]>(() => {
   let filtered = users.value;
 
-  // 搜索过滤
   if (searchKeyword.value) {
     const keyword = searchKeyword.value.toLowerCase();
     filtered = filtered.filter(user =>
-      user.username.toLowerCase().includes(keyword) ||
-      user.email.toLowerCase().includes(keyword)
+      getUserProperty(user, 'username').toLowerCase().includes(keyword) ||
+      getUserProperty(user, 'email').toLowerCase().includes(keyword)
     );
   }
 
-  // 角色过滤
   if (roleFilter.value) {
-    filtered = filtered.filter(user => user.role === roleFilter.value);
+    filtered = filtered.filter(user => getUserProperty(user, 'role') === roleFilter.value);
   }
 
-  // 状态过滤
   if (statusFilter.value) {
-    filtered = filtered.filter(user => user.status === statusFilter.value);
+    filtered = filtered.filter(user => getUserProperty(user, 'status') === statusFilter.value);
   }
 
-  // 排序
   filtered.sort((a, b) => {
-    let aVal = a[sortField.value];
-    let bVal = b[sortField.value];
+    let aVal = a[sortField.value as keyof User];
+    let bVal = b[sortField.value as keyof User];
 
-    // 处理数字类型
+    // 处理数字类型字段
     if (sortField.value === 'id') {
-      aVal = parseInt(aVal);
-      bVal = parseInt(bVal);
+      aVal = aVal !== undefined ? parseInt(String(aVal)) : 0;
+      bVal = bVal !== undefined ? parseInt(String(bVal)) : 0;
+    }
+    // 处理日期类型字段
+    else if (sortField.value === 'registeredAt') {
+      aVal = aVal ? new Date(aVal as string).getTime() : 0;
+      bVal = bVal ? new Date(bVal as string).getTime() : 0;
+    }
+    // 处理其他可能的字段，确保它们不是undefined
+    else {
+      // 对于其他字段，如果它们是undefined，则提供一个默认值
+      // 字符串字段可以转换为小写进行比较，但首先确保它们不是undefined
+      if (aVal !== undefined && bVal !== undefined) {
+        // 如果是字符串，确保安全转换
+        if (typeof aVal === 'string' && typeof bVal === 'string') {
+          aVal = aVal.toLowerCase();
+          bVal = bVal.toLowerCase();
+        }
+      } else {
+        // 如果任一值为undefined，给它们一个默认值以确保排序稳定
+        aVal = '';
+        bVal = '';
+      }
     }
 
-    // 处理日期类型
-    if (sortField.value === 'registeredAt') {
-      aVal = new Date(aVal);
-      bVal = new Date(bVal);
+    // 确保aVal和bVal在进行比较前不是undefined
+    // 对于数字比较
+    if (typeof aVal === 'number' && typeof bVal === 'number') {
+      if (sortDirection.value === 'asc') {
+        return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+      } else {
+        return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
+      }
     }
-
-    if (sortDirection.value === 'asc') {
-      return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
-    } else {
-      return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
+    // 对于字符串比较
+    else if (typeof aVal === 'string' && typeof bVal === 'string') {
+      if (sortDirection.value === 'asc') {
+        return aVal.localeCompare(bVal);
+      } else {
+        return bVal.localeCompare(aVal);
+      }
+    }
+    // 对于其他类型，提供默认排序
+    else {
+      if (sortDirection.value === 'asc') {
+        return 0;
+      } else {
+        return 0;
+      }
     }
   });
 
   return filtered;
 });
 
-const paginatedUsers = computed(() => {
+const paginatedUsers = computed<User[]>(() => {
   const start = (currentPage.value - 1) * pageSize.value;
   const end = start + pageSize.value;
   return filteredUsers.value.slice(start, end);
 });
 
-const totalPages = computed(() => {
+const totalPages = computed<number>(() => {
   return Math.ceil(filteredUsers.value.length / pageSize.value);
 });
 
-const totalUsers = computed(() => users.value.length);
-const activeUsers = computed(() => users.value.filter(u => u.status === 'active').length);
-const adminUsers = computed(() => users.value.filter(u => u.role === 'admin').length);
-const guestUsers = computed(() => users.value.filter(u => u.role === 'guest').length);
+const totalUsers = computed<number>(() => users.value.length);
+const activeUsers = computed<number>(() => users.value.filter(u => getUserProperty(u, 'status') === 'active').length);
+const adminUsers = computed<number>(() => users.value.filter(u => getUserProperty(u, 'role') === 'admin').length);
+const guestUsers = computed<number>(() => users.value.filter(u => getUserProperty(u, 'role') === 'guest').length);
 
 // 监听过滤条件变化，重置页码
 watch([searchKeyword, roleFilter, statusFilter], () => {
@@ -665,7 +758,7 @@ watch([searchKeyword, roleFilter, statusFilter], () => {
 });
 
 // 消息提示函数
-function showMessage(text, type = 'info', duration = 3000) {
+function showMessage(text: string, type: 'success' | 'error' | 'warning' | 'info' = 'info', duration: number = 3000): void {
   message.value = {
     show: true,
     text,
@@ -678,7 +771,7 @@ function showMessage(text, type = 'info', duration = 3000) {
 }
 
 // 格式化日期
-function formatDate(dateString) {
+function formatDate(dateString?: string): string {
   if (!dateString) return '-';
   const date = new Date(dateString);
   return date.toLocaleDateString('zh-CN', {
@@ -690,34 +783,72 @@ function formatDate(dateString) {
   });
 }
 
-// 查看用户权限
-async function viewUserPermissions(user) {
+// 查看用户权限 - 修复权限数据处理
+async function viewUserPermissions(user: User): Promise<void> {
   try {
     permissionUser.value = { ...user };
     showPermissionDialog.value = true;
     permissionLoading.value = true;
 
-    console.log('🔎 开始查看用户权限:', user);
-
     const result = await fetchUserRoutePermissions(user.id);
-    console.log('📝 用户权限API响应:', result);
 
-    if (result.success) {
-      userPermissions.value = result.data.permissions || [];
-      allPermissions.value = result.data.allAvailablePermissions || [];
-      // 初始化临时选择的权限
-      tempSelectedPermissions.value = userPermissions.value.map(p => p.name);
+    if (result.success && result.data) {
+      // 安全处理权限数据 - 修复类型不匹配问题
+      userPermissions.value = [];
+      allPermissions.value = [];
+      tempSelectedPermissions.value = [];
 
-      console.log('✅ 用户权限加载完成');
-      console.log('   当前权限:', userPermissions.value);
-      console.log('   所有可用:', allPermissions.value.length);
+      // 处理 permissions 数据
+      if (result.data.permissions) {
+        // 方案1: 如果权限数据已经是我们期望的格式 (有 name 和 title 属性)
+        if (Array.isArray(result.data.permissions) &&
+          result.data.permissions.length > 0 &&
+          'name' in result.data.permissions[0] &&
+          'title' in result.data.permissions[0]) {
+          userPermissions.value = result.data.permissions as Permission[];
+        }
+        // 方案2: 如果权限数据格式不同，进行转换
+        else if (Array.isArray(result.data.permissions)) {
+          userPermissions.value = (result.data.permissions as Array<{ name: string; title: string;[key: string]: any }>).map((p: any) => ({
+            name: p.name,
+            title: p.title,
+            category: p.category || '', // 确保category有默认值
+            path: p.path,
+            description: p.description
+          })) as Permission[];
+        }
+      }
+
+      // 处理 allAvailablePermissions 数据
+      if (result.data.allAvailablePermissions) {
+        if (Array.isArray(result.data.allAvailablePermissions) &&
+          result.data.allAvailablePermissions.length > 0 &&
+          'name' in result.data.allAvailablePermissions[0] &&
+          'title' in result.data.allAvailablePermissions[0]) {
+          allPermissions.value = result.data.allAvailablePermissions as Permission[];
+        }
+        else if (Array.isArray(result.data.allAvailablePermissions)) {
+          allPermissions.value = (result.data.allAvailablePermissions as Array<{ name: string; title: string;[key: string]: any }>).map((p: any) => ({
+            name: p.name,
+            title: p.title,
+            category: p.category || '', // 确保category有默认值
+            path: p.path,
+            description: p.description
+          })) as Permission[];
+        }
+      }
+
+      // 设置选中的权限
+      if (userPermissions.value.length > 0) {
+        tempSelectedPermissions.value = userPermissions.value.map(p => p.name);
+      }
     } else {
-      console.error('❌ API返回错误:', result.message);
+      console.error('API返回错误:', result.message);
       showMessage(result.message || '获取用户权限失败', 'error');
       showPermissionDialog.value = false;
     }
   } catch (error) {
-    console.error('🚨 查看用户权限异常:', error);
+    console.error('查看用户权限异常:', error);
     showMessage('查看用户权限失败，请重试', 'error');
     showPermissionDialog.value = false;
   } finally {
@@ -726,7 +857,7 @@ async function viewUserPermissions(user) {
 }
 
 // 保存用户权限更改
-async function savePermissionChanges() {
+async function savePermissionChanges(): Promise<void> {
   if (!permissionUser.value || !isSuperAdmin.value) {
     showMessage('没有权限修改用户权限', 'error');
     return;
@@ -734,36 +865,25 @@ async function savePermissionChanges() {
 
   try {
     permissionSaving.value = true;
-    console.log('💾 开始保存权限更改:', {
-      userId: permissionUser.value.id,
-      newPermissions: tempSelectedPermissions.value
-    });
-
     const result = await updateUserRoutePermissions(
       permissionUser.value.id,
       tempSelectedPermissions.value
     );
 
-    console.log('📝 保存权限API响应:', result);
-
     if (result.success) {
-      // 更新本地数据
       userPermissions.value = allPermissions.value.filter(p =>
         tempSelectedPermissions.value.includes(p.name)
       );
 
       showMessage('用户权限更新成功', 'success');
-      console.log('✅ 权限更新成功');
     } else {
-      console.error('❌ API返回错误:', result.message);
+      console.error('API返回错误:', result.message);
       showMessage(result.message || '更新用户权限失败', 'error');
-      // 恢复临时选择
       tempSelectedPermissions.value = userPermissions.value.map(p => p.name);
     }
   } catch (error) {
-    console.error('🚨 保存权限异常:', error);
+    console.error('保存权限异常:', error);
     showMessage('保存权限失败，请重试', 'error');
-    // 恢复临时选择
     tempSelectedPermissions.value = userPermissions.value.map(p => p.name);
   } finally {
     permissionSaving.value = false;
@@ -771,13 +891,12 @@ async function savePermissionChanges() {
 }
 
 // 取消权限编辑
-function cancelPermissionEdit() {
-  // 恢复临时选择到原始状态
+function cancelPermissionEdit(): void {
   tempSelectedPermissions.value = userPermissions.value.map(p => p.name);
 }
 
 // 关闭权限弹窗
-function closePermissionDialog() {
+function closePermissionDialog(): void {
   showPermissionDialog.value = false;
   permissionUser.value = null;
   userPermissions.value = [];
@@ -785,67 +904,78 @@ function closePermissionDialog() {
   tempSelectedPermissions.value = [];
 }
 
-// 获取可用权限列表
-async function loadAvailablePermissions() {
-  if (!isSuperAdmin.value) return; // 非超级管理员不加载
+// 获取可用权限列表 - 修复权限类型处理
+async function loadAvailablePermissions(): Promise<void> {
+  if (!isSuperAdmin.value) return;
 
   try {
     permissionsLoading.value = true;
-    console.log('🔄 开始加载可用权限...');
 
     const result = await fetchAvailablePermissions();
-    console.log('📝 可用权限API响应:', result);
 
-    if (result.success) {
-      availablePermissions.value = result.data || [];
-      console.log('✅ 可用权限加载完成:', availablePermissions.value);
+    if (result.success && result.data) {
+      // 处理权限数据，确保类型安全
+      if (Array.isArray(result.data)) {
+        // 方案1: 数据已经是正确的Permission类型
+        if (result.data.length > 0 && 'name' in result.data[0] && 'title' in result.data[0]) {
+          availablePermissions.value = result.data as Permission[];
+        }
+        // 方案2: 数据格式不同，进行转换
+        else {
+          availablePermissions.value = (result.data as Array<{ name: string; title: string;[key: string]: any }>).map((p: any) => ({
+            name: p.name,
+            title: p.title,
+            category: p.category || '', // 确保category有默认值
+            path: p.path,
+            description: p.description
+          })) as Permission[];
+        }
+      } else {
+        availablePermissions.value = [];
+      }
     } else {
-      console.error('❌ API返回错误:', result.message);
+      console.error('API返回错误:', result.message);
       showMessage(result.message || '获取可用权限失败', 'error');
     }
   } catch (error) {
-    console.error('🚨 获取可用权限异常:', error);
+    console.error('获取可用权限异常:', error);
     showMessage('获取可用权限失败，请检查网络连接', 'error');
   } finally {
     permissionsLoading.value = false;
   }
 }
 
-// 获取用户列表
-async function loadUsers() {
+// 获取用户列表 - 修复用户status属性问题
+async function loadUsers(): Promise<void> {
   try {
     loading.value = true;
-    console.log('🔄 开始加载用户列表...');
 
     const result = await fetchUsers();
-    console.log('📋 用户列表API响应:', result);
 
-    if (result.success) {
-      // 将后端数据转换为前端需要的格式
-      users.value = result.data.map(user => ({
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        role: user.permissions?.includes('guest')
-          ? 'guest'
-          : user.permissions?.includes('admin')
-            ? 'admin'
-            : 'user',
-        status: user.status || 'active', // 使用后端返回的status或默认为active
-        registeredAt: user.registeredAt
-      }));
-      console.log('✅ 用户列表转换完成:', users.value);
+    if (result.success && result.data) {
+      users.value = result.data.map(user => {
+        // 确保每个用户都有status属性，如果API没有返回则默认为'active'
+        const userStatus = (user as any).status !== undefined ? (user as any).status : 'active';
+
+        return {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          role: user.permissions?.includes('guest')
+            ? 'guest'
+            : user.permissions?.includes('admin')
+              ? 'admin'
+              : 'user',
+          status: userStatus as 'active' | 'inactive', // 确保类型正确
+          registeredAt: user.registeredAt
+        };
+      });
     } else {
-      console.error('❌ API返回错误:', result.message);
+      console.error('API返回错误:', result.message);
       showMessage(result.message || '获取用户列表失败', 'error');
     }
   } catch (error) {
-    console.error('🚨 获取用户列表异常:', error);
-    console.error('错误详情:', {
-      message: error.message,
-      response: error.response?.data,
-      status: error.response?.status
-    });
+    console.error('获取用户列表异常:', error);
     showMessage('获取用户列表失败，请检查网络连接或重启Mock服务器', 'error');
   } finally {
     loading.value = false;
@@ -853,7 +983,7 @@ async function loadUsers() {
 }
 
 // 排序功能
-function sortBy(field) {
+function sortBy(field: string): void {
   if (sortField.value === field) {
     sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
   } else {
@@ -862,14 +992,14 @@ function sortBy(field) {
   }
 }
 
-function getSortIcon(field) {
+function getSortIcon(field: string): string {
   if (sortField.value !== field) {
     return 'icon-sort';
   }
   return sortDirection.value === 'asc' ? 'icon-sort-up' : 'icon-sort-down';
 }
 
-function handleAddUser() {
+function handleAddUser(): void {
   if (isSuperAdmin.value === false) {
     showMessage('你没有权限添加用户', 'info');
     return;
@@ -879,27 +1009,21 @@ function handleAddUser() {
 }
 
 // 添加用户
-async function addUser() {
+async function addUser(): Promise<void> {
   try {
     addLoading.value = true;
-    console.log('🆕 开始添加用户:', newUser.value);
 
-    // 调用API创建用户
     const result = await apiCreateUser({
       username: newUser.value.username,
       email: newUser.value.email,
       password: newUser.value.password,
       permissions: newUser.value.role === 'admin' ? ['admin'] : [],
       status: newUser.value.status,
-      routePermissions: isSuperAdmin.value ? newUser.value.routePermissions : [] // 只有超级管理员才能设置路由权限
+      routePermissions: isSuperAdmin.value ? newUser.value.routePermissions : []
     });
-
-    console.log('📋 创建用户API响应:', result);
 
     if (result.success) {
       showAddDialog.value = false;
-
-      // 重置表单
       newUser.value = {
         username: '',
         email: '',
@@ -908,22 +1032,14 @@ async function addUser() {
         status: 'active',
         routePermissions: []
       };
-
-      // 重新加载用户列表
       await loadUsers();
       showMessage('用户添加成功', 'success');
-      console.log('✅ 用户添加成功');
     } else {
-      console.error('❌ API返回错误:', result.message);
+      console.error('API返回错误:', result.message);
       showMessage(result.message || '添加用户失败', 'error');
     }
   } catch (error) {
-    console.error('🚨 添加用户异常:', error);
-    console.error('错误详情:', {
-      message: error.message,
-      response: error.response?.data,
-      status: error.response?.status
-    });
+    console.error('添加用户异常:', error);
     showMessage('添加用户失败，请重试', 'error');
   } finally {
     addLoading.value = false;
@@ -931,22 +1047,26 @@ async function addUser() {
 }
 
 // 编辑用户
-function editUser(user) {
+function editUser(user: User): void {
   if (isSuperAdmin.value === false) {
     showMessage('你没有权限修改用户信息', 'info');
     return;
   }
-  editingUser.value = { ...user };
+  editingUser.value = {
+    id: user.id,
+    username: user.username,
+    email: user.email,
+    role: user.role,
+    status: user.status
+  };
   showEditDialog.value = true;
 }
 
 // 更新用户
-async function updateUser() {
+async function updateUser(): Promise<void> {
   try {
     editLoading.value = true;
-    console.log('✏️ 开始更新用户:', editingUser.value);
 
-    // 调用API更新用户
     const result = await apiUpdateUser(editingUser.value.id, {
       username: editingUser.value.username,
       email: editingUser.value.email,
@@ -954,26 +1074,16 @@ async function updateUser() {
       status: editingUser.value.status
     });
 
-    console.log('📋 更新用户API响应:', result);
-
     if (result.success) {
       showEditDialog.value = false;
-
-      // 重新加载用户列表
       await loadUsers();
       showMessage('用户信息更新成功', 'success');
-      console.log('✅ 用户信息更新成功');
     } else {
-      console.error('❌ API返回错误:', result.message);
+      console.error('API返回错误:', result.message);
       showMessage(result.message || '更新用户失败', 'error');
     }
   } catch (error) {
-    console.error('🚨 更新用户异常:', error);
-    console.error('错误详情:', {
-      message: error.message,
-      response: error.response?.data,
-      status: error.response?.status
-    });
+    console.error('更新用户异常:', error);
     showMessage('更新用户失败，请重试', 'error');
   } finally {
     editLoading.value = false;
@@ -981,16 +1091,7 @@ async function updateUser() {
 }
 
 // 确认删除
-function confirmDelete(user) {
-  // if (user.role === 'guest') {
-  //   showMessage('超级管理员不能删除', 'info');
-  //   return;
-  // } else if (user.role === 'admin') {
-  //   showMessage('管理员不能删除', 'info');
-  // } else {
-  //   userToDelete.value = user;
-  //   showDeleteDialog.value = true;
-  // }
+function confirmDelete(user: User): void {
   if (isSuperAdmin.value === false) {
     showMessage('你没有权限删除', 'info');
   } else {
@@ -1000,32 +1101,23 @@ function confirmDelete(user) {
 }
 
 // 执行删除
-async function performDelete() {
+async function performDelete(): Promise<void> {
   if (!userToDelete.value) return;
 
   try {
     deleteLoading.value = true;
-    console.log('🗑️ 开始删除用户:', userToDelete.value);
 
     const result = await apiDeleteUser(userToDelete.value.id);
-    console.log('📋 删除用户API响应:', result);
 
     if (result.success) {
       showMessage(`用户 "${userToDelete.value.username}" 删除成功`, 'success');
-      // 重新获取用户列表
       await loadUsers();
-      console.log('✅ 用户删除成功');
     } else {
-      console.error('❌ API返回错误:', result.message);
+      console.error('API返回错误:', result.message);
       showMessage(result.message || '删除用户失败', 'error');
     }
   } catch (error) {
-    console.error('🚨 删除用户异常:', error);
-    console.error('错误详情:', {
-      message: error.message,
-      response: error.response?.data,
-      status: error.response?.status
-    });
+    console.error('删除用户异常:', error);
     showMessage('删除用户失败，请检查网络连接', 'error');
   } finally {
     deleteLoading.value = false;
@@ -1034,9 +1126,8 @@ async function performDelete() {
   }
 }
 
-
 // 获取消息图标
-function getMessageIcon(type) {
+function getMessageIcon(type: 'success' | 'error' | 'warning' | 'info'): string {
   const icons = {
     success: 'icon-check',
     error: 'icon-error',
@@ -1047,11 +1138,10 @@ function getMessageIcon(type) {
 }
 
 // 组件挂载时加载数据
-onMounted(() => {
-  loadUsers();
-  // 如果是超级管理员，加载可用权限列表
+onMounted(async (): Promise<void> => {
+  await loadUsers();
   if (isSuperAdmin.value) {
-    loadAvailablePermissions();
+    await loadAvailablePermissions();
   }
 });
 </script>
@@ -1086,7 +1176,9 @@ onMounted(() => {
 * {
   box-sizing: border-box;
 }
+</style>
 
+<style scoped>
 .user-management {
   padding: 24px;
   min-height: 100vh;

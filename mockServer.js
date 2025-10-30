@@ -1,12 +1,148 @@
-// mockServer.js
 import express from 'express';
 import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
 import multer from 'multer';
+import * as XLSX from 'xlsx';
 
 const app = express();
 const port = 3001;
+
+// 审计日志存储
+const AUDIT_LOGS_FILE = path.join(process.cwd(), 'auditLogs.json');
+let auditLogs = [];
+
+// 加载审计日志
+function loadAuditLogs() {
+    try {
+        if (fs.existsSync(AUDIT_LOGS_FILE)) {
+            const data = fs.readFileSync(AUDIT_LOGS_FILE, 'utf8');
+            auditLogs = JSON.parse(data);
+            console.log('📂 从文件加载审计日志成功，日志数量:', auditLogs.length);
+        }
+    } catch (error) {
+        console.error('❌ 加载审计日志失败:', error.message);
+        auditLogs = [];
+    }
+}
+
+// 保存审计日志
+function saveAuditLogs() {
+    try {
+        fs.writeFileSync(AUDIT_LOGS_FILE, JSON.stringify(auditLogs, null, 2), 'utf8');
+        return true;
+    } catch (error) {
+        console.error('❌ 保存审计日志失败:', error.message);
+        return false;
+    }
+}
+
+// 获取真实IP地址
+function getClientIP(req) {
+    // 优先从代理头部获取真实IP
+    return req.headers['x-forwarded-for'] ||
+        req.headers['x-real-ip'] ||
+        req.connection.remoteAddress ||
+        req.socket.remoteAddress ||
+        (req.connection.socket ? req.connection.socket.remoteAddress : null) ||
+        req.ip ||
+        '127.0.0.1';
+}
+
+// 获取IP地理位置信息
+async function getIPLocationInfo(ip) {
+    if (!ip || ip === 'system') return '系统操作';
+
+    // 本地地址处理
+    if (ip === '::1' || ip === '::ffff:127.0.0.1' || ip === '127.0.0.1') {
+        return '本地主机';
+    }
+
+    try {
+        // 使用免费的IP地理位置API
+        const fetch = (await import('node-fetch')).default;
+        const response = await fetch(`http://ip-api.com/json/${ip}?lang=zh-CN&fields=status,country,regionName,city,isp`);
+        const data = await response.json();
+
+        if (data.status === 'success') {
+            const { country, regionName, city, isp } = data;
+            return `${country} ${regionName} ${city} (${isp})`;
+        } else {
+            return '位置未知';
+        }
+    } catch (error) {
+        console.error('获取IP地理位置失败:', error.message);
+        return '位置获取失败';
+    }
+}
+
+// 格式化IP地址显示
+function formatIPAddress(ip) {
+    if (!ip) return '未知';
+
+    // 处理IPv6本地回环地址
+    if (ip === '::1' || ip === '::ffff:127.0.0.1') {
+        return '127.0.0.1 (本地)';
+    }
+
+    // 处理IPv4映射到IPv6的地址
+    if (ip.startsWith('::ffff:')) {
+        return ip.substring(7) + ' (IPv4)';
+    }
+
+    // 处理标准IPv4地址
+    if (ip.includes('.') && !ip.includes(':')) {
+        return ip + ' (IPv4)';
+    }
+
+    // 处理IPv6地址
+    if (ip.includes(':')) {
+        return ip + ' (IPv6)';
+    }
+
+    return ip;
+}
+
+// 创建审计日志记录
+async function createAuditLog(userId, username, action, module, details, status = 'success', req = null) {
+    // 获取真实IP地址
+    const rawIP = req ? getClientIP(req) : 'system';
+    const formattedIP = rawIP === 'system' ? '系统操作' : formatIPAddress(rawIP);
+
+    // 异步获取IP地理位置信息
+    let locationInfo = '未知位置';
+    try {
+        locationInfo = await getIPLocationInfo(rawIP);
+    } catch (error) {
+        console.error('获取IP位置失败:', error.message);
+    }
+
+    const log = {
+        id: Date.now().toString() + Math.random().toString(36).substring(2),
+        userId: userId,
+        username: username,
+        action: action,
+        module: module,
+        details: details,
+        ipAddress: formattedIP,
+        rawIP: rawIP, // 保存原始IP供调试使用
+        location: locationInfo, // 新增地理位置信息
+        userAgent: req ? req.get('User-Agent') : 'system',
+        timestamp: new Date().toISOString(),
+        status: status
+    };
+
+    auditLogs.unshift(log); // 新日志放在最前面
+
+    // 限制日志数量，保留最近1000条
+    if (auditLogs.length > 1000) {
+        auditLogs = auditLogs.slice(0, 1000);
+    }
+
+    saveAuditLogs();
+    console.log('📝 创建审计日志:', `${username} - ${action} - ${module} - ${details} [位置: ${locationInfo}]`);
+    return log;
+}
 
 // 创建上传目录
 const UPLOAD_DIR = path.join(process.cwd(), 'uploads', 'avatars');
@@ -53,6 +189,9 @@ app.use(express.json());
 
 // 静态文件服务 - 提供头像访问
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+
+// 静态文件服务 - 提供导出文件下载
+app.use('/downloads', express.static(path.join(process.cwd(), 'downloads')));
 
 // 数据文件路径
 const DATA_FILE = path.join(process.cwd(), 'userData.json');
@@ -233,8 +372,11 @@ let userIdCounter = userData.userIdCounter;
 // 初始化路由权限配置
 let routePermissionsConfig = loadRoutePermissions();
 
+// 初始化审计日志
+loadAuditLogs();
+
 // 用户登录API - 添加详细的日志和错误处理
-app.post('/api/login', (req, res) => {
+app.post('/api/login', async (req, res) => {
     try {
         console.log('收到登录请求:', req.body);
 
@@ -259,9 +401,17 @@ app.post('/api/login', (req, res) => {
 
         if (user && user.password === password) {
             console.log('登录成功:', username);
+
+            // 生成简单的token（在实际项目中应该使用JWT等安全token）
+            const token = `token_${user.id}_${Date.now()}_${Math.random().toString(36).substring(2)}`;
+
+            // 记录登录成功的审计日志
+            await createAuditLog(user.id, user.username, 'login', 'auth', '用户登录成功', 'success', req);
+
             res.json({
                 success: true,
                 userId: user.id,
+                token: token,
                 userInfo: {
                     id: user.id,
                     username: user.username,
@@ -270,6 +420,12 @@ app.post('/api/login', (req, res) => {
             });
         } else {
             console.log('登录失败: 用户名或密码错误');
+
+            // 记录登录失败的审计日志
+            const userId = user ? user.id : 0;
+            const displayUsername = user ? user.username : username;
+            await createAuditLog(userId, displayUsername, 'login', 'auth', '用户登录失败: 用户名或密码错误', 'failed', req);
+
             res.status(401).json({
                 success: false,
                 message: '用户名或密码错误'
@@ -826,10 +982,10 @@ app.get('/api/user/:userId/route-permissions', (req, res) => {
         // 获取所有可用权限
         const allAvailablePermissions = routePermissionsConfig.availableRoutes || [];
 
-        // 过滤出用户已有的权限详情
-        const userPermissionDetails = allAvailablePermissions.filter(route =>
-            userPermissions.includes(route.name)
-        );
+        // 按照用户权限配置的顺序生成权限详情（保持原有顺序）
+        const userPermissionDetails = userPermissions.map(permissionName => {
+            return allAvailablePermissions.find(route => route.name === permissionName);
+        }).filter(route => route !== undefined); // 过滤掉未找到的权限
 
         const responseData = {
             userId: userId,
@@ -1605,6 +1761,7 @@ app.put('/api/profile/:userId', (req, res) => {
     }
 });
 
+// 上传用户头像API
 // 上传用户头像API - 真实文件上传
 app.post('/api/profile/:userId/avatar', upload.single('avatar'), (req, res) => {
     try {
@@ -1897,6 +2054,408 @@ app.put('/api/profile/:userId/password', (req, res) => {
 app.get('/api/health', (req, res) => {
     res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
+
+// =================== 审计日志 API ===================
+
+// 获取审计日志列表
+app.get('/api/audit-logs', (req, res) => {
+    try {
+        const {
+            page = 1,
+            limit = 20,
+            userId,
+            module,
+            action,
+            startDate,
+            endDate
+        } = req.query;
+
+        let filteredLogs = [...auditLogs];
+
+        // 筛选条件
+        if (userId) {
+            filteredLogs = filteredLogs.filter(log => log.userId == userId);
+        }
+        if (module) {
+            filteredLogs = filteredLogs.filter(log => log.module === module);
+        }
+        if (action) {
+            filteredLogs = filteredLogs.filter(log => log.action === action);
+        }
+        if (startDate) {
+            filteredLogs = filteredLogs.filter(log => new Date(log.timestamp) >= new Date(startDate));
+        }
+        if (endDate) {
+            filteredLogs = filteredLogs.filter(log => new Date(log.timestamp) <= new Date(endDate));
+        }
+
+        // 分页
+        const total = filteredLogs.length;
+        const startIndex = (page - 1) * limit;
+        const endIndex = startIndex + parseInt(limit);
+        const paginatedLogs = filteredLogs.slice(startIndex, endIndex);
+
+        console.log(`📄 获取审计日志，筛选后数量: ${total}，返回: ${paginatedLogs.length}`);
+
+        res.json({
+            success: true,
+            data: {
+                logs: paginatedLogs,
+                total: total,
+                page: parseInt(page),
+                limit: parseInt(limit)
+            }
+        });
+    } catch (error) {
+        console.error('获取审计日志错误:', error);
+        res.status(500).json({
+            success: false,
+            message: '获取审计日志失败',
+            data: { logs: [], total: 0, page: 1, limit: 20 }
+        });
+    }
+});
+
+// 创建审计日志
+app.post('/api/audit-logs', async (req, res) => {
+    try {
+        const { action, module, details, status = 'success' } = req.body;
+
+        // 从请求中获取用户信息（假设从 token 中解析）
+        // 这里简化处理，实际应该从 JWT 中获取
+        const userId = req.body.userId || 1;
+        const username = req.body.username || 'system';
+
+        if (!action || !module || !details) {
+            return res.status(400).json({
+                success: false,
+                message: '操作类型、模块和详情都是必填的'
+            });
+        }
+
+        const log = await createAuditLog(userId, username, action, module, details, status, req);
+
+        res.status(201).json({
+            success: true,
+            message: '审计日志创建成功',
+            data: log
+        });
+    } catch (error) {
+        console.error('创建审计日志错误:', error);
+        res.status(500).json({
+            success: false,
+            message: '创建审计日志失败'
+        });
+    }
+});
+
+// 获取用户操作统计
+app.get('/api/audit-logs/stats/:userId', (req, res) => {
+    try {
+        const { userId } = req.params;
+        let targetLogs = auditLogs;
+
+        if (userId) {
+            targetLogs = auditLogs.filter(log => log.userId == userId);
+        }
+
+        const today = new Date().toISOString().split('T')[0];
+        const todayLogs = targetLogs.filter(log => log.timestamp.startsWith(today));
+
+        // 操作类型统计
+        const actionStats = {};
+        targetLogs.forEach(log => {
+            actionStats[log.action] = (actionStats[log.action] || 0) + 1;
+        });
+
+        // 模块统计
+        const moduleStats = {};
+        targetLogs.forEach(log => {
+            moduleStats[log.module] = (moduleStats[log.module] || 0) + 1;
+        });
+
+        const stats = {
+            totalActions: targetLogs.length,
+            todayActions: todayLogs.length,
+            recentActions: Object.entries(actionStats).map(([action, count]) => ({ action, count })),
+            moduleStats: Object.entries(moduleStats).map(([module, count]) => ({ module, count }))
+        };
+
+        console.log(`📈 获取用户 ${userId || '全部'} 的操作统计:`, stats);
+
+        res.json({
+            success: true,
+            data: stats
+        });
+    } catch (error) {
+        console.error('获取操作统计错误:', error);
+        res.status(500).json({
+            success: false,
+            message: '获取操作统计失败'
+        });
+    }
+});
+
+// 获取所有用户操作统计
+app.get('/api/audit-logs/stats', (req, res) => {
+    try {
+        let targetLogs = auditLogs;
+
+        const today = new Date().toISOString().split('T')[0];
+        const todayLogs = targetLogs.filter(log => log.timestamp.startsWith(today));
+
+        // 操作类型统计
+        const actionStats = {};
+        targetLogs.forEach(log => {
+            actionStats[log.action] = (actionStats[log.action] || 0) + 1;
+        });
+
+        // 模块统计
+        const moduleStats = {};
+        targetLogs.forEach(log => {
+            moduleStats[log.module] = (moduleStats[log.module] || 0) + 1;
+        });
+
+        const stats = {
+            totalActions: targetLogs.length,
+            todayActions: todayLogs.length,
+            recentActions: Object.entries(actionStats).map(([action, count]) => ({ action, count })),
+            moduleStats: Object.entries(moduleStats).map(([module, count]) => ({ module, count }))
+        };
+
+        console.log(`📈 获取所有用户的操作统计:`, stats);
+
+        res.json({
+            success: true,
+            data: stats
+        });
+    } catch (error) {
+        console.error('获取操作统计错误:', error);
+        res.status(500).json({
+            success: false,
+            message: '获取操作统计失败'
+        });
+    }
+});
+
+// 删除单个审计日志
+app.delete('/api/audit-logs/:logId', (req, res) => {
+    try {
+        const { logId } = req.params;
+
+        if (!logId) {
+            return res.status(400).json({
+                success: false,
+                message: '需要提供要删除的日志ID'
+            });
+        }
+
+        const originalLength = auditLogs.length;
+        const logIndex = auditLogs.findIndex(log => log.id === logId);
+
+        if (logIndex === -1) {
+            return res.status(404).json({
+                success: false,
+                message: '找不到指定的日志记录'
+            });
+        }
+
+        const deletedLog = auditLogs[logIndex];
+        auditLogs.splice(logIndex, 1);
+
+        saveAuditLogs();
+
+        console.log(`🗑️ 删除审计日志: ${deletedLog.username} - ${deletedLog.action} - ${deletedLog.module}`);
+
+        res.json({
+            success: true,
+            message: '成功删除日志记录',
+            data: { deleted: true }
+        });
+    } catch (error) {
+        console.error('删除审计日志错误:', error);
+        res.status(500).json({
+            success: false,
+            message: '删除审计日志失败'
+        });
+    }
+});
+
+// 删除审计日志（管理员权限）
+app.delete('/api/audit-logs', (req, res) => {
+    try {
+        const { logIds } = req.body;
+
+        if (!logIds || !Array.isArray(logIds)) {
+            return res.status(400).json({
+                success: false,
+                message: '需要提供要删除的日志ID数组'
+            });
+        }
+
+        const originalLength = auditLogs.length;
+        auditLogs = auditLogs.filter(log => !logIds.includes(log.id));
+        const deletedCount = originalLength - auditLogs.length;
+
+        saveAuditLogs();
+
+        console.log(`🗑️ 删除审计日志: ${deletedCount} 条`);
+
+        res.json({
+            success: true,
+            message: `成功删除 ${deletedCount} 条日志`,
+            data: { deletedCount }
+        });
+    } catch (error) {
+        console.error('删除审计日志错误:', error);
+        res.status(500).json({
+            success: false,
+            message: '删除审计日志失败'
+        });
+    }
+});
+
+// 导出审计日志
+app.post('/api/audit-logs/export', (req, res) => {
+    try {
+        const { userId, module, action, startDate, endDate, format = 'xlsx' } = req.body;
+
+        let exportLogs = [...auditLogs];
+
+        // 应用筛选条件
+        if (userId) {
+            exportLogs = exportLogs.filter(log => log.userId == userId);
+        }
+        if (module) {
+            exportLogs = exportLogs.filter(log => log.module === module);
+        }
+        if (action) {
+            exportLogs = exportLogs.filter(log => log.action === action);
+        }
+        if (startDate) {
+            exportLogs = exportLogs.filter(log => new Date(log.timestamp) >= new Date(startDate));
+        }
+        if (endDate) {
+            exportLogs = exportLogs.filter(log => new Date(log.timestamp) <= new Date(endDate));
+        }
+
+        console.log(`📄 导出审计日志: ${exportLogs.length} 条，格式: ${format}`);
+
+        if (format === 'xlsx') {
+            // 生成真正的Excel文件
+            try {
+                // 创建下载目录
+                const downloadsDir = path.join(process.cwd(), 'downloads');
+                if (!fs.existsSync(downloadsDir)) {
+                    fs.mkdirSync(downloadsDir, { recursive: true });
+                }
+
+                // 准备Excel数据
+                const excelData = exportLogs.map(log => ({
+                    '时间': new Date(log.timestamp).toLocaleString('zh-CN'),
+                    '用户ID': log.userId,
+                    '用户名': log.username,
+                    '模块': getModuleDisplayName(log.module),
+                    '操作': getActionDisplayName(log.action),
+                    '详情': log.details,
+                    '状态': log.status === 'success' ? '成功' : '失败',
+                    'IP地址': log.ipAddress || '-',
+                    '地理位置': log.location || '未知位置',
+                    '用户代理': log.userAgent || '-'
+                }));
+
+                // 创建工作簿
+                const workbook = XLSX.utils.book_new();
+                const worksheet = XLSX.utils.json_to_sheet(excelData);
+
+                // 设置列宽
+                const colWidths = [
+                    { wch: 18 }, // 时间
+                    { wch: 8 },  // 用户ID
+                    { wch: 12 }, // 用户名
+                    { wch: 10 }, // 模块
+                    { wch: 8 },  // 操作
+                    { wch: 30 }, // 详情
+                    { wch: 8 },  // 状态
+                    { wch: 15 }, // IP地址
+                    { wch: 20 }, // 地理位置
+                    { wch: 25 }  // 用户代理
+                ];
+                worksheet['!cols'] = colWidths;
+
+                // 添加工作表
+                XLSX.utils.book_append_sheet(workbook, worksheet, '操作日志');
+
+                // 生成文件名
+                const filename = `audit_logs_${new Date().toISOString().split('T')[0]}_${Date.now()}.xlsx`;
+                const filePath = path.join(downloadsDir, filename);
+
+                // 写入文件
+                XLSX.writeFile(workbook, filePath);
+
+                console.log(`✅ Excel文件已生成: ${filePath}`);
+
+                // 返回可下载的文件信息
+                res.json({
+                    success: true,
+                    message: '导出成功',
+                    data: {
+                        downloadUrl: `/downloads/${filename}`,
+                        filename: filename,
+                        recordCount: exportLogs.length
+                    }
+                });
+            } catch (excelError) {
+                console.error('生成Excel文件失败:', excelError);
+                res.status(500).json({
+                    success: false,
+                    message: '生成Excel文件失败: ' + excelError.message
+                });
+            }
+        } else {
+            // 其他格式的导出（如CSV）
+            const filename = `audit_logs_${new Date().toISOString().split('T')[0]}.${format}`;
+            const downloadUrl = `/downloads/${filename}`;
+
+            res.json({
+                success: true,
+                message: '导出成功',
+                data: { downloadUrl }
+            });
+        }
+    } catch (error) {
+        console.error('导出审计日志错误:', error);
+        res.status(500).json({
+            success: false,
+            message: '导出审计日志失败'
+        });
+    }
+});
+
+// 辅助函数：获取模块显示名称
+function getModuleDisplayName(module) {
+    const moduleNames = {
+        auth: '认证',
+        user: '用户管理',
+        profile: '个人资料',
+        permission: '权限管理',
+        system: '系统设置'
+    };
+    return moduleNames[module] || module;
+}
+
+// 辅助函数：获取操作显示名称
+function getActionDisplayName(action) {
+    const actionNames = {
+        login: '登录',
+        logout: '退出',
+        create: '创建',
+        update: '更新',
+        delete: '删除',
+        view: '查看'
+    };
+    return actionNames[action] || action;
+}
 
 // 启动服务器
 app.listen(port, () => {

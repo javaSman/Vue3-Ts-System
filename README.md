@@ -1,48 +1,170 @@
-# vue3+Ts
+# 🚀 企业级管理系统
 
-This template should help get you started developing with Vue 3 in Vite.
+一个功能完整的现代化企业管理平台，基于 Vue 3 + TypeScript 构建，提供完整的用户管理、权限控制、操作审计、数据可视化等企业级功能。
 
-## Recommended IDE Setup
+## ✨ 核心特性
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+### 🔐 安全与权限
 
-## Type Support for `.vue` Imports in TS
+- **用户认证系统**: 安全登录、注册、密码管理
+- **权限管理**: 基于角色的访问控制（RBAC）
+- **输入验证**: XSS 防护、SQL 注入检测、文件上传安全
+- **操作审计**: 全面的用户操作日志记录和追踪
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+### 📈 数据管理
 
-## Customize configuration
+- **用户管理**: CRUD 操作、批量处理、数据导出
+- **个人资料**: 头像上传、信息编辑、安全设置
+- **数据中心**: 实时数据展示、可视化图表、报表导出
+- **备份恢复**: 数据备份、定时任务、快速恢复
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+### 🔔 监控与通知
 
-## Project Setup
+- **操作日志**: 全面的系统操作记录、实时监控、**Excel 导出功能**
+- **错误监控**: 全局错误捕获、性能监控、自动上报
+- **通知系统**: 站内消息、实时提醒、多类型通知
+- **系统设置**: 集中化配置管理、环境参数调优
 
-```sh
+### 🎨 用户体验
+
+- **现代化 UI**: 响应式设计、流畅动画、暗黑模式支持
+- **国际化**: 中文本地化、国内用户体验优化
+- **可访问性**: 语义化 HTML、键盘导航、屏幕阅读器支持
+- **性能优化**: 懒加载、虚拟滚动、缓存策略
+
+## 🛠️ 技术栈
+
+### 前端
+
+- **框架**: Vue 3 + TypeScript + Composition API
+- **路由**: Vue Router 4 (动态路由 + 权限守卫)
+- **状态管理**: Pinia (持久化支持)
+- **构建工具**: Vite (快速开发 + HMR)
+- **数据可视化**: ECharts 5
+- **文件处理**: file-saver + docx
+
+### 后端 (Mock 服务)
+
+- **服务器**: Express.js + CORS
+- **数据存储**: JSON 文件 (支持持久化)
+- **文件上传**: Multer + 本地存储
+- **API 设计**: RESTful + 统一响应格式
+- **Excel 处理**: XLSX.js (导出功能) 下载命令行-- npm install xlsx
+- **关闭淘宝镜像 ssl** npm config set strict-ssl false
+
+## 🚀 快速开始
+
+### 环境要求
+
+- Node.js >= 20.19.0
+- npm >= 8.0.0
+
+### 安装与运行
+
+```bash
+# 安装依赖
 npm install
+
+# 启动开发环境 (前端 + Mock服务器)
+npm run start
+
+# 或者分别启动
+npm run dev      # 前端开发服务器 (http://localhost:3000)
+npm run mock     # Mock API服务器 (http://localhost:3001)
 ```
 
-### Compile and Hot-Reload for Development
+### 默认账户
 
-```sh
-npm run dev
-```
+| 用户名 | 密码     | 角色     | 权限       |
+| ------ | -------- | -------- | ---------- |
+| admin  | admin123 | 管理员   | 所有功能   |
+| user   | user123  | 普通用户 | 限制权限   |
+| guest  | 21693    | 访客     | 管理员权限 |
 
-### Type-Check, Compile and Minify for Production
+## 📚 功能模块
 
-```sh
-npm run build
-```
+### 1. 🔍 操作日志审计 **[已优化]**
 
-### Run the Mock Server
-```sh
-node mockServer.js
-```
+- ✅ 自动记录所有关键操作
+- ✅ 多维度筛选查询
+- ✅ **Excel 导出功能** (已修复空文件问题)
+- ✅ IP 地址智能解析和地理位置显示
+- ✅ 日志删除和管理功能
+- ✅ 实时统计分析
 
-## Install Docx and FileSaver
-```sh
-npm install docx file-saver  //导出word文档
-```
+### 2. 👥 用户管理系统
 
-## pinia 状态持久化插件
-```sh
-npm install pinia-plugin-persistedstate  //状态持久化
-```
+- ✅ 用户 CRUD 操作
+- ✅ 批量用户处理
+- ✅ 角色权限分配
+- ✅ 用户状态管理
+
+### 3. 👤 个人资料管理
+
+- ✅ 头像上传预览
+- ✅ 个人信息编辑
+- ✅ 密码安全修改
+- ✅ 双重认证设置
+
+### 4. 📈 数据中心
+
+- ✅ 实时数据监控
+- ✅ 交互式图表展示
+- ✅ 数据导出 (Excel/Word)
+- ✅ 设备地图可视化
+
+### 5. 🔔 通知系统
+
+- ✅ 站内消息通知
+- ✅ 实时通知数量
+- ✅ 多类型通知支持
+- ✅ 通知设置管理
+
+### 6. ⚙️ 系统设置
+
+- ✅ 全局系统配置
+- ✅ 安全参数设置
+- ✅ 邮件服务配置
+- ✅ 系统状态监控
+
+## 🔧 最新更新 (2025-09-26)
+
+### 操作日志 Excel 导出功能修复 ✅
+
+**修复问题**: 之前导出的 Excel 文件为空，现已完全修复
+
+**修复内容**:
+
+- ✅ 安装并集成了 XLSX.js 库
+- ✅ 实现了真正的 Excel 文件生成逻辑
+- ✅ 添加了静态文件服务器支持文件下载
+- ✅ 优化了前端导出体验（加载状态 + 成功反馈）
+- ✅ Excel 文件包含完整数据和中文表头
+- ✅ 支持所有筛选条件的导出
+
+**使用方式**:
+
+1. 进入操作日志页面 (`/audit-logs`)
+2. 设置筛选条件（可选）
+3. 点击“📥 导出日志”按钮
+4. 等待导出完成提示
+5. 文件自动下载到本地
+
+## 📱 响应式设计
+
+完全支持桌面、平板和手机设备的完美适配，提供一致的用户体验。
+
+## 🔐 安全特性
+
+- **输入验证**: 全面的 XSS 防护和 SQL 注入检测
+- **文件安全**: 上传文件类型和大小严格限制
+- **数据加密**: 敏感数据本地加密存储
+- **操作审计**: 所有关键操作完整记录和追踪
+  自料功能优化说明.md`
+- `操作日志导出功能修复报告.md`
+
+---
+
+**项目状态**: ✅ 生产就绪  
+**最后更新**: 2025-09-26  
+**技术支持**: Vue 3 + TypeScript + Express.js

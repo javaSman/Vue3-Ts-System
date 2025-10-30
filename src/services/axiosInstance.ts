@@ -12,10 +12,13 @@ const axiosInstance = axios.create({
 // 请求拦截器
 axiosInstance.interceptors.request.use(
     (config) => {
-        // 可以在这里添加token等认证信息
+        // 添加token到请求头
         const token = localStorage.getItem('authToken');
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
+            console.log('已添加token到请求头:', token.substring(0, 20) + '...');
+        } else {
+            console.log('未找到token，跳过Authorization头设置');
         }
         return config;
     },
@@ -34,6 +37,14 @@ axiosInstance.interceptors.response.use(
         if (error.response) {
             // 服务器返回错误状态码
             console.error('API Error:', error.response.status, error.response.data);
+            
+            // 处理401未授权错误
+            if (error.response.status === 401) {
+                console.log('Token已失效，清除本地存储并跳转到登录页');
+                localStorage.removeItem('authToken');
+                // 可以在这里跳转到登录页或触发logout事件
+                window.location.href = '/login';
+            }
         } else if (error.request) {
             // 请求已发出但没有收到响应
             console.error('Network Error:', error.request);
