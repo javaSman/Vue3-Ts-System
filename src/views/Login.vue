@@ -4,7 +4,12 @@
     <div class="tech-background">
       <div class="gradient-overlay"></div>
       <div class="floating-particles">
-        <div class="particle" v-for="i in 20" :key="i" :style="{ '--delay': `${i * 0.1}s` }"></div>
+        <div
+          class="particle"
+          v-for="i in 20"
+          :key="i"
+          :style="{ '--delay': `${i * 0.1}s` }"
+        ></div>
       </div>
       <div class="grid-lines">
         <div class="grid-line" v-for="i in 10" :key="i"></div>
@@ -22,13 +27,32 @@
       <div class="login-header">
         <div class="logo-container">
           <div class="logo-icon">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round" />
-              <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round" />
-              <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round" />
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 2L2 7L12 12L22 7L12 2Z"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M2 17L12 22L22 17"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M2 12L12 17L22 12"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
             </svg>
           </div>
           <h1>系统登录</h1>
@@ -43,7 +67,13 @@
             用户名
           </label>
           <div class="input-container">
-            <input v-model="loginForm.username" type="text" placeholder="请输入用户名" required :disabled="loading" />
+            <input
+              v-model="loginForm.username"
+              type="text"
+              placeholder="请输入用户名"
+              required
+              :disabled="loading"
+            />
             <div class="input-border"></div>
           </div>
         </div>
@@ -54,11 +84,20 @@
             密码
           </label>
           <div class="input-container">
-            <input v-model="loginForm.password" :type="showPassword ? 'text' : 'password'" placeholder="请输入密码" required
-              :disabled="loading" />
+            <input
+              v-model="loginForm.password"
+              :type="showPassword ? 'text' : 'password'"
+              placeholder="请输入密码"
+              required
+              :disabled="loading"
+            />
             <div class="input-border"></div>
-            <button type="button" class="password-toggle" @click="showPassword = !showPassword">
-              {{ showPassword ? '👁️' : '👁️‍🗨️' }}
+            <button
+              type="button"
+              class="password-toggle"
+              @click="showPassword = !showPassword"
+            >
+              {{ showPassword ? "👁️" : "👁️‍🗨️" }}
             </button>
           </div>
         </div>
@@ -66,18 +105,30 @@
         <div class="form-options">
           <label class="remember-me">
             <div class="custom-checkbox">
-              <input type="checkbox" v-model="rememberMe" :checked="rememberMe" @change="handleRememberMeChange" />
+              <input
+                type="checkbox"
+                v-model="rememberMe"
+                :checked="rememberMe"
+                @change="handleRememberMeChange"
+              />
               <span class="checkmark"></span>
             </div>
             <span>记住我</span>
           </label>
-          <a href="#" class="forgot-password" @click.prevent="showForgotPassword = true">忘记密码？</a>
+          <a
+            href="#"
+            class="forgot-password"
+            @click.prevent="showForgotPassword = true"
+            >忘记密码？</a
+          >
         </div>
 
         <button type="submit" class="login-btn" :disabled="loading">
           <div class="btn-content">
             <span v-if="loading" class="loading-spinner"></span>
-            <span v-else class="btn-text">{{ loading ? '登录中...' : '登录' }}</span>
+            <span v-else class="btn-text">{{
+              loading ? "登录中..." : "登录"
+            }}</span>
           </div>
           <div class="btn-glow"></div>
         </button>
@@ -89,7 +140,12 @@
       </form>
 
       <div class="login-footer">
-        <p>还没有账户？ <a href="#" class="register-link" @click.prevent="showRegister = true">立即注册</a></p>
+        <p>
+          还没有账户？
+          <a href="#" class="register-link" @click.prevent="showRegister = true"
+            >立即注册</a
+          >
+        </p>
       </div>
     </div>
 
@@ -99,13 +155,32 @@
       <div class="login-header">
         <div class="logo-container">
           <div class="logo-icon">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round" />
-              <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round" />
-              <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round" />
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 2L2 7L12 12L22 7L12 2Z"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M2 17L12 22L22 17"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M2 12L12 17L22 12"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
             </svg>
           </div>
           <h1>重置密码</h1>
@@ -120,28 +195,50 @@
             邮箱地址
           </label>
           <div class="input-container">
-            <input v-model="forgotPasswordForm.email" type="email" placeholder="请输入您的邮箱地址" required
-              :disabled="forgotPasswordLoading" />
+            <input
+              v-model="forgotPasswordForm.email"
+              type="email"
+              placeholder="请输入您的邮箱地址"
+              required
+              :disabled="forgotPasswordLoading"
+            />
             <div class="input-border"></div>
           </div>
         </div>
 
-        <button type="submit" class="login-btn" :disabled="forgotPasswordLoading">
+        <button
+          type="submit"
+          class="login-btn"
+          :disabled="forgotPasswordLoading"
+        >
           <div class="btn-content">
             <span v-if="forgotPasswordLoading" class="loading-spinner"></span>
-            <span v-else class="btn-text">{{ forgotPasswordLoading ? '发送中...' : '发送重置链接' }}</span>
+            <span v-else class="btn-text">{{
+              forgotPasswordLoading ? "发送中..." : "发送重置链接"
+            }}</span>
           </div>
           <div class="btn-glow"></div>
         </button>
 
-        <div v-if="forgotPasswordMessage" class="message" :class="forgotPasswordMessageType">
-          <span class="message-icon">{{ forgotPasswordMessageType === 'success' ? '✅' : '⚠️' }}</span>
+        <div
+          v-if="forgotPasswordMessage"
+          class="message"
+          :class="forgotPasswordMessageType"
+        >
+          <span class="message-icon">{{
+            forgotPasswordMessageType === "success" ? "✅" : "⚠️"
+          }}</span>
           {{ forgotPasswordMessage }}
         </div>
       </form>
 
       <div class="login-footer">
-        <a href="#" class="back-link" @click.prevent="showForgotPassword = false">← 返回登录</a>
+        <a
+          href="#"
+          class="back-link"
+          @click.prevent="showForgotPassword = false"
+          >← 返回登录</a
+        >
       </div>
     </div>
 
@@ -151,13 +248,32 @@
       <div class="login-header">
         <div class="logo-container">
           <div class="logo-icon">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round" />
-              <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round" />
-              <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round" />
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 2L2 7L12 12L22 7L12 2Z"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M2 17L12 22L22 17"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M2 12L12 17L22 12"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
             </svg>
           </div>
           <h1>用户注册</h1>
@@ -172,8 +288,13 @@
             用户名
           </label>
           <div class="input-container">
-            <input v-model="registerForm.username" type="text" placeholder="请输入用户名" required
-              :disabled="registerLoading" />
+            <input
+              v-model="registerForm.username"
+              type="text"
+              placeholder="请输入用户名"
+              required
+              :disabled="registerLoading"
+            />
             <div class="input-border"></div>
           </div>
         </div>
@@ -184,8 +305,13 @@
             邮箱地址
           </label>
           <div class="input-container">
-            <input v-model="registerForm.email" type="email" placeholder="请输入邮箱地址" required
-              :disabled="registerLoading" />
+            <input
+              v-model="registerForm.email"
+              type="email"
+              placeholder="请输入邮箱地址"
+              required
+              :disabled="registerLoading"
+            />
             <div class="input-border"></div>
           </div>
         </div>
@@ -196,11 +322,20 @@
             密码
           </label>
           <div class="input-container">
-            <input v-model="registerForm.password" :type="showRegisterPassword ? 'text' : 'password'"
-              placeholder="请输入密码" required :disabled="registerLoading" />
+            <input
+              v-model="registerForm.password"
+              :type="showRegisterPassword ? 'text' : 'password'"
+              placeholder="请输入密码"
+              required
+              :disabled="registerLoading"
+            />
             <div class="input-border"></div>
-            <button type="button" class="password-toggle" @click="showRegisterPassword = !showRegisterPassword">
-              {{ showRegisterPassword ? '👁️' : '👁️‍🗨️' }}
+            <button
+              type="button"
+              class="password-toggle"
+              @click="showRegisterPassword = !showRegisterPassword"
+            >
+              {{ showRegisterPassword ? "👁️" : "👁️‍🗨️" }}
             </button>
           </div>
         </div>
@@ -211,11 +346,20 @@
             确认密码
           </label>
           <div class="input-container">
-            <input v-model="registerForm.confirmPassword" :type="showConfirmPassword ? 'text' : 'password'"
-              placeholder="请再次输入密码" required :disabled="registerLoading" />
+            <input
+              v-model="registerForm.confirmPassword"
+              :type="showConfirmPassword ? 'text' : 'password'"
+              placeholder="请再次输入密码"
+              required
+              :disabled="registerLoading"
+            />
             <div class="input-border"></div>
-            <button type="button" class="password-toggle" @click="showConfirmPassword = !showConfirmPassword">
-              {{ showConfirmPassword ? '👁️' : '👁️‍🗨️' }}
+            <button
+              type="button"
+              class="password-toggle"
+              @click="showConfirmPassword = !showConfirmPassword"
+            >
+              {{ showConfirmPassword ? "👁️" : "👁️‍🗨️" }}
             </button>
           </div>
         </div>
@@ -223,31 +367,54 @@
         <div class="form-options">
           <label class="remember-me">
             <div class="custom-checkbox">
-              <input type="checkbox" v-model="registerForm.agreeTerms" required :checked="registerForm.agreeTerms"
-                @change="handleAgreeTermsChange" />
+              <input
+                type="checkbox"
+                v-model="registerForm.agreeTerms"
+                required
+                :checked="registerForm.agreeTerms"
+                @change="handleAgreeTermsChange"
+              />
               <span class="checkmark"></span>
             </div>
-            <span>我同意 <a href="#" class="terms-link" @click.prevent="showTerms = true">服务条款</a> 和 <a href="#"
-                class="terms-link" @click.prevent="showPrivacy = true">隐私政策</a></span>
+            <span
+              >我同意
+              <a href="#" class="terms-link" @click.prevent="showTerms = true"
+                >服务条款</a
+              >
+              和
+              <a href="#" class="terms-link" @click.prevent="showPrivacy = true"
+                >隐私政策</a
+              ></span
+            >
           </label>
         </div>
 
         <button type="submit" class="login-btn" :disabled="registerLoading">
           <div class="btn-content">
             <span v-if="registerLoading" class="loading-spinner"></span>
-            <span v-else class="btn-text">{{ registerLoading ? '注册中...' : '注册' }}</span>
+            <span v-else class="btn-text">{{
+              registerLoading ? "注册中..." : "注册"
+            }}</span>
           </div>
           <div class="btn-glow"></div>
         </button>
 
-        <div v-if="registerMessage" class="message" :class="registerMessageType">
-          <span class="message-icon">{{ registerMessageType === 'success' ? '✅' : '⚠️' }}</span>
+        <div
+          v-if="registerMessage"
+          class="message"
+          :class="registerMessageType"
+        >
+          <span class="message-icon">{{
+            registerMessageType === "success" ? "✅" : "⚠️"
+          }}</span>
           {{ registerMessage }}
         </div>
       </form>
 
       <div class="login-footer">
-        <a href="#" class="back-link" @click.prevent="showRegister = false">← 返回登录</a>
+        <a href="#" class="back-link" @click.prevent="showRegister = false"
+          >← 返回登录</a
+        >
       </div>
     </div>
 
@@ -260,25 +427,35 @@
         </div>
         <div class="modal-body">
           <h3>1. 服务说明</h3>
-          <p>本系统为用户提供智能管理服务，包括但不限于数据管理、用户管理、权限控制等功能。</p>
+          <p>
+            本系统为用户提供智能管理服务，包括但不限于数据管理、用户管理、权限控制等功能。
+          </p>
 
           <h3>2. 用户责任</h3>
-          <p>用户在使用本系统时应遵守相关法律法规，不得从事违法活动，不得侵犯他人权益。</p>
+          <p>
+            用户在使用本系统时应遵守相关法律法规，不得从事违法活动，不得侵犯他人权益。
+          </p>
 
           <h3>3. 系统使用</h3>
-          <p>用户应妥善保管账户信息，不得将账户转让给他人使用，因账户安全问题造成的损失由用户自行承担。</p>
+          <p>
+            用户应妥善保管账户信息，不得将账户转让给他人使用，因账户安全问题造成的损失由用户自行承担。
+          </p>
 
           <h3>4. 服务变更</h3>
           <p>我们保留随时修改或终止服务的权利，修改后的条款将在系统中公布。</p>
 
           <h3>5. 免责声明</h3>
-          <p>在法律法规允许的范围内，我们不对因使用本系统而产生的任何直接或间接损失承担责任。</p>
+          <p>
+            在法律法规允许的范围内，我们不对因使用本系统而产生的任何直接或间接损失承担责任。
+          </p>
 
           <h3>6. 争议解决</h3>
           <p>本条款的解释和争议解决适用中华人民共和国法律。</p>
         </div>
         <div class="modal-footer">
-          <button class="modal-btn" @click="showTerms = false">我已阅读并同意</button>
+          <button class="modal-btn" @click="showTerms = false">
+            我已阅读并同意
+          </button>
         </div>
       </div>
     </div>
@@ -292,19 +469,27 @@
         </div>
         <div class="modal-body">
           <h3>1. 信息收集</h3>
-          <p>我们收集的信息包括：用户名、邮箱地址、登录时间、操作日志等必要信息。</p>
+          <p>
+            我们收集的信息包括：用户名、邮箱地址、登录时间、操作日志等必要信息。
+          </p>
 
           <h3>2. 信息使用</h3>
-          <p>收集的信息仅用于：提供系统服务、改善用户体验、系统安全维护等目的。</p>
+          <p>
+            收集的信息仅用于：提供系统服务、改善用户体验、系统安全维护等目的。
+          </p>
 
           <h3>3. 信息保护</h3>
-          <p>我们采用行业标准的安全措施保护用户信息，包括数据加密、访问控制等。</p>
+          <p>
+            我们采用行业标准的安全措施保护用户信息，包括数据加密、访问控制等。
+          </p>
 
           <h3>4. 信息共享</h3>
           <p>除法律法规要求外，我们不会向第三方分享用户信息。</p>
 
           <h3>5. 用户权利</h3>
-          <p>用户有权查看、修改、删除自己的个人信息，有权要求我们停止收集相关信息。</p>
+          <p>
+            用户有权查看、修改、删除自己的个人信息，有权要求我们停止收集相关信息。
+          </p>
 
           <h3>6. 政策更新</h3>
           <p>我们可能会更新本隐私政策，更新后的政策将在系统中公布。</p>
@@ -313,7 +498,9 @@
           <p>如对隐私政策有疑问，请联系我们的客服团队。</p>
         </div>
         <div class="modal-footer">
-          <button class="modal-btn" @click="showPrivacy = false">我已阅读并同意</button>
+          <button class="modal-btn" @click="showPrivacy = false">
+            我已阅读并同意
+          </button>
         </div>
       </div>
     </div>
@@ -321,30 +508,30 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { useAuthStore } from '@/stores/auth';
-import { registerUser } from '@/api/auth';
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
+import { registerUser } from "@/api/auth";
 
 const router = useRouter();
 const authStore = useAuthStore();
 
 // 表单状态
 const loginForm = ref({
-  username: '',
-  password: ''
+  username: "",
+  password: "",
 });
 
 const forgotPasswordForm = ref({
-  email: ''
+  email: "",
 });
 
 const registerForm = ref({
-  username: '',
-  email: '',
-  password: '',
-  confirmPassword: '',
-  agreeTerms: false
+  username: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
+  agreeTerms: false,
 });
 
 // UI状态
@@ -355,11 +542,11 @@ const rememberMe = ref(false);
 const loading = ref(false);
 const forgotPasswordLoading = ref(false);
 const registerLoading = ref(false);
-const errorMessage = ref('');
-const forgotPasswordMessage = ref('');
-const forgotPasswordMessageType = ref<'success' | 'error'>('success');
-const registerMessage = ref('');
-const registerMessageType = ref<'success' | 'error'>('success');
+const errorMessage = ref("");
+const forgotPasswordMessage = ref("");
+const forgotPasswordMessageType = ref<"success" | "error">("success");
+const registerMessage = ref("");
+const registerMessageType = ref<"success" | "error">("success");
 
 // 页面切换状态
 const showForgotPassword = ref(false);
@@ -369,11 +556,11 @@ const showPrivacy = ref(false);
 
 // 从本地存储恢复记住我的状态
 onMounted(() => {
-  const savedUsername = localStorage.getItem('rememberedUsername');
-  const savedRememberMe = localStorage.getItem('rememberMe');
-  const savedPassword = localStorage.getItem('rememberedPassword');
+  const savedUsername = localStorage.getItem("rememberedUsername");
+  const savedRememberMe = localStorage.getItem("rememberMe");
+  const savedPassword = localStorage.getItem("rememberedPassword");
 
-  if (savedRememberMe === 'true' && savedUsername && savedPassword) {
+  if (savedRememberMe === "true" && savedUsername && savedPassword) {
     rememberMe.value = true;
     loginForm.value.username = savedUsername;
     loginForm.value.password = savedPassword;
@@ -394,26 +581,29 @@ function handleAgreeTermsChange(event: Event) {
 
 async function handleLogin() {
   if (!loginForm.value.username || !loginForm.value.password) {
-    errorMessage.value = '请输入用户名和密码';
+    errorMessage.value = "请输入用户名和密码";
     return;
   }
 
   loading.value = true;
-  errorMessage.value = '';
+  errorMessage.value = "";
 
   try {
-    const success = await (authStore as any).login(loginForm.value.username, loginForm.value.password);
+    const success = await (authStore as any).login(
+      loginForm.value.username,
+      loginForm.value.password
+    );
 
     if (success) {
       // 处理记住我功能
       if (rememberMe.value) {
-        localStorage.setItem('rememberMe', 'true');
-        localStorage.setItem('rememberedUsername', loginForm.value.username);
-        localStorage.setItem('rememberedPassword', loginForm.value.password);
+        localStorage.setItem("rememberMe", "true");
+        localStorage.setItem("rememberedUsername", loginForm.value.username);
+        localStorage.setItem("rememberedPassword", loginForm.value.password);
       } else {
-        localStorage.removeItem('rememberMe');
-        localStorage.removeItem('rememberedUsername');
-        localStorage.removeItem('rememberedPassword');
+        localStorage.removeItem("rememberMe");
+        localStorage.removeItem("rememberedUsername");
+        localStorage.removeItem("rememberedPassword");
       }
 
       // 登录成功：若动态路由尚未加载，先加载再跳转
@@ -421,28 +611,30 @@ async function handleLogin() {
         try {
           await (authStore as any).loadDynamicRoutes();
         } catch (e) {
-          console.error('登录后加载动态路由失败:', e);
+          console.error("登录后加载动态路由失败:", e);
         }
       }
 
       // 获取重定向地址，如果没有则使用动态首页
-      const redirect = (router.currentRoute.value.query.redirect as string) || authStore.homePage;
+      const redirect =
+        (router.currentRoute.value.query.redirect as string) ||
+        authStore.homePage;
 
       // 检查重定向的路由是否存在
       const targetRoute = router.resolve(redirect);
       if (targetRoute.matched.length === 0) {
-        console.log('重定向路由不存在，跳转到动态首页');
+        console.log("重定向路由不存在，跳转到动态首页");
         router.replace(authStore.homePage);
       } else {
-        console.log('登录成功，跳转到:', redirect);
+        console.log("登录成功，跳转到:", redirect);
         router.replace(redirect);
       }
     } else {
-      errorMessage.value = '登录失败，请检查用户名和密码';
+      errorMessage.value = "登录失败，请检查用户名和密码";
     }
   } catch (error: any) {
-    console.error('Login error:', error);
-    errorMessage.value = error.message || '登录失败，请稍后重试';
+    console.error("Login error:", error);
+    errorMessage.value = error.message || "登录失败，请稍后重试";
   } finally {
     loading.value = false;
   }
@@ -450,39 +642,38 @@ async function handleLogin() {
 
 async function handleForgotPassword() {
   if (!forgotPasswordForm.value.email) {
-    forgotPasswordMessage.value = '请输入邮箱地址';
-    forgotPasswordMessageType.value = 'error';
+    forgotPasswordMessage.value = "请输入邮箱地址";
+    forgotPasswordMessageType.value = "error";
     return;
   }
 
   // 简单的邮箱格式验证
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(forgotPasswordForm.value.email)) {
-    forgotPasswordMessage.value = '请输入有效的邮箱地址';
-    forgotPasswordMessageType.value = 'error';
+    forgotPasswordMessage.value = "请输入有效的邮箱地址";
+    forgotPasswordMessageType.value = "error";
     return;
   }
 
   forgotPasswordLoading.value = true;
-  forgotPasswordMessage.value = '';
+  forgotPasswordMessage.value = "";
 
   try {
     // 模拟发送重置密码邮件的API调用
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    forgotPasswordMessage.value = '重置链接已发送到您的邮箱，请查收';
-    forgotPasswordMessageType.value = 'success';
+    forgotPasswordMessage.value = "重置链接已发送到您的邮箱，请查收";
+    forgotPasswordMessageType.value = "success";
 
     // 3秒后自动返回登录页面
     setTimeout(() => {
       showForgotPassword.value = false;
-      forgotPasswordForm.value.email = '';
-      forgotPasswordMessage.value = '';
+      forgotPasswordForm.value.email = "";
+      forgotPasswordMessage.value = "";
     }, 3000);
-
   } catch (error: any) {
-    forgotPasswordMessage.value = '发送失败，请稍后重试';
-    forgotPasswordMessageType.value = 'error';
+    forgotPasswordMessage.value = "发送失败，请稍后重试";
+    forgotPasswordMessageType.value = "error";
   } finally {
     forgotPasswordLoading.value = false;
   }
@@ -490,44 +681,49 @@ async function handleForgotPassword() {
 
 async function handleRegister() {
   // 调试信息
-  console.log('注册表单数据:', registerForm.value);
-  console.log('同意条款状态:', registerForm.value.agreeTerms);
+  console.log("注册表单数据:", registerForm.value);
+  console.log("同意条款状态:", registerForm.value.agreeTerms);
 
   // 表单验证
-  if (!registerForm.value.username || !registerForm.value.email || !registerForm.value.password || !registerForm.value.confirmPassword) {
-    registerMessage.value = '请填写所有必填字段';
-    registerMessageType.value = 'error';
+  if (
+    !registerForm.value.username ||
+    !registerForm.value.email ||
+    !registerForm.value.password ||
+    !registerForm.value.confirmPassword
+  ) {
+    registerMessage.value = "请填写所有必填字段";
+    registerMessageType.value = "error";
     return;
   }
 
   if (registerForm.value.password !== registerForm.value.confirmPassword) {
-    registerMessage.value = '两次输入的密码不一致';
-    registerMessageType.value = 'error';
+    registerMessage.value = "两次输入的密码不一致";
+    registerMessageType.value = "error";
     return;
   }
 
   if (registerForm.value.password.length < 6) {
-    registerMessage.value = '密码长度至少6位';
-    registerMessageType.value = 'error';
+    registerMessage.value = "密码长度至少6位";
+    registerMessageType.value = "error";
     return;
   }
 
   if (!registerForm.value.agreeTerms) {
-    registerMessage.value = '请勾选同意服务条款和隐私政策';
-    registerMessageType.value = 'error';
+    registerMessage.value = "请勾选同意服务条款和隐私政策";
+    registerMessageType.value = "error";
     return;
   }
 
   // 简单的邮箱格式验证
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(registerForm.value.email)) {
-    registerMessage.value = '请输入有效的邮箱地址';
-    registerMessageType.value = 'error';
+    registerMessage.value = "请输入有效的邮箱地址";
+    registerMessageType.value = "error";
     return;
   }
 
   registerLoading.value = true;
-  registerMessage.value = '';
+  registerMessage.value = "";
 
   try {
     // 调用注册API
@@ -535,14 +731,15 @@ async function handleRegister() {
       username: registerForm.value.username,
       email: registerForm.value.email,
       password: registerForm.value.password,
-      confirmPassword: registerForm.value.confirmPassword
+      confirmPassword: registerForm.value.confirmPassword,
     });
 
     if (result.success) {
-      registerMessage.value = result.message || '注册成功！正在自动跳转并填充登录信息...';
-      registerMessageType.value = 'success';
+      registerMessage.value =
+        result.message || "注册成功！正在自动跳转并填充登录信息...";
+      registerMessageType.value = "success";
 
-      console.log('注册成功，用户信息:', result.userInfo);
+      console.log("注册成功，用户信息:", result.userInfo);
 
       // 保存注册成功的用户名和密码，用于自动填充
       const registeredUsername = registerForm.value.username;
@@ -558,26 +755,25 @@ async function handleRegister() {
 
         // 清空注册表单
         registerForm.value = {
-          username: '',
-          email: '',
-          password: '',
-          confirmPassword: '',
-          agreeTerms: false
+          username: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+          agreeTerms: false,
         };
-        registerMessage.value = '';
+        registerMessage.value = "";
 
         // 可以选择自动勾选“记住我”（可选）
         // rememberMe.value = true;
       }, 3000);
     } else {
-      registerMessage.value = result.message || '注册失败，请稍后重试';
-      registerMessageType.value = 'error';
+      registerMessage.value = result.message || "注册失败，请稍后重试";
+      registerMessageType.value = "error";
     }
-
   } catch (error: any) {
-    console.error('注册错误:', error);
-    registerMessage.value = error.message || '注册失败，请稍后重试';
-    registerMessageType.value = 'error';
+    console.error("注册错误:", error);
+    registerMessage.value = error.message || "注册失败，请稍后重试";
+    registerMessageType.value = "error";
   } finally {
     registerLoading.value = false;
   }
@@ -611,15 +807,25 @@ async function handleRegister() {
   left: 0;
   right: 0;
   bottom: 0;
-  background:
-    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+  background: radial-gradient(
+      circle at 20% 80%,
+      rgba(120, 119, 198, 0.3) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 20%,
+      rgba(255, 119, 198, 0.3) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 40% 40%,
+      rgba(120, 219, 255, 0.2) 0%,
+      transparent 50%
+    );
   animation: gradientShift 20s ease-in-out infinite;
 }
 
 @keyframes gradientShift {
-
   0%,
   100% {
     transform: scale(1) rotate(0deg);
@@ -653,7 +859,6 @@ async function handleRegister() {
 }
 
 @keyframes float {
-
   0%,
   100% {
     transform: translateY(0px) translateX(0px);
@@ -675,7 +880,12 @@ async function handleRegister() {
 
 .grid-line {
   position: absolute;
-  background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.1), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 212, 255, 0.1),
+    transparent
+  );
   height: 1px;
   width: 100%;
   animation: gridMove 8s linear infinite;
@@ -744,7 +954,6 @@ async function handleRegister() {
 }
 
 @keyframes circlePulse {
-
   0%,
   100% {
     transform: scale(1);
@@ -815,7 +1024,6 @@ async function handleRegister() {
 }
 
 @keyframes logoFloat {
-
   0%,
   100% {
     transform: translateY(0px);
@@ -910,7 +1118,7 @@ async function handleRegister() {
   z-index: -1;
 }
 
-.form-group input:focus+.input-border {
+.form-group input:focus + .input-border {
   opacity: 1;
 }
 
@@ -980,7 +1188,7 @@ async function handleRegister() {
   z-index: 1;
 }
 
-.custom-checkbox input:checked~.checkmark {
+.custom-checkbox input:checked ~ .checkmark {
   background: linear-gradient(45deg, #00d4ff, #ff00ff);
   border-color: transparent;
 }
@@ -998,7 +1206,7 @@ async function handleRegister() {
   transform: rotate(45deg);
 }
 
-.custom-checkbox input:checked~.checkmark:after {
+.custom-checkbox input:checked ~ .checkmark:after {
   display: block;
 }
 
@@ -1045,7 +1253,12 @@ async function handleRegister() {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
   transition: left 0.5s ease;
 }
 

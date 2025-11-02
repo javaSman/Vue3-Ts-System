@@ -6,17 +6,33 @@
     <nav class="menu-wrap">
       <ul class="menu">
         <template v-for="item in topLevelMenu" :key="item.path">
-          <li class="menu-item" @mouseenter="hovered = item.path" @mouseleave="hovered = ''">
-            <RouterLink :to="resolveTo(item)" class="link" :class="{ active: isActive(item) }">
+          <li
+            class="menu-item"
+            @mouseenter="hovered = item.path"
+            @mouseleave="hovered = ''"
+          >
+            <RouterLink
+              :to="resolveTo(item)"
+              class="link"
+              :class="{ active: isActive(item) }"
+            >
               <span class="link-text">{{ item.meta?.title || item.name }}</span>
               <span class="underline" />
               <span class="hover-effect"></span>
             </RouterLink>
 
-            <ul v-if="item.children && item.children.length" class="submenu" :class="{ show: hovered === item.path }">
+            <ul
+              v-if="item.children && item.children.length"
+              class="submenu"
+              :class="{ show: hovered === item.path }"
+            >
               <li v-for="c in item.children" :key="c.path" class="submenu-item">
-                <RouterLink :to="resolveTo(c, item.path)" class="sublink" :class="{ active: isActive(c, item.path) }"
-                  @click.prevent="onSubNavigate(c, item.path)">
+                <RouterLink
+                  :to="resolveTo(c, item.path)"
+                  class="sublink"
+                  :class="{ active: isActive(c, item.path) }"
+                  @click.prevent="onSubNavigate(c, item.path)"
+                >
                   {{ c.meta?.title || c.name }}
                 </RouterLink>
               </li>
@@ -37,24 +53,27 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { storeToRefs } from 'pinia';
-import { useAuthStore } from '@/stores/auth';
+import { computed, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { storeToRefs } from "pinia";
+import { useAuthStore } from "@/stores/auth";
 
 const auth = useAuthStore();
 const { menuRoutes } = storeToRefs(auth);
 const route = useRoute();
 const router = useRouter();
-const hovered = ref('');
+const hovered = ref("");
 
-const topLevelMenu = computed(() => (menuRoutes.value || []).filter(r => r.path && r.name));
+const topLevelMenu = computed(() =>
+  (menuRoutes.value || []).filter((r) => r.path && r.name)
+);
 
 function resolveTo(r: any, parentPath?: string) {
-  const base = (typeof r.redirect === 'string' && r.redirect) ? r.redirect : r.path;
-  if (!base) return '/';
-  if (base.startsWith('/')) return base;
-  if (parentPath && parentPath.endsWith('/')) return `${parentPath}${base}`;
+  const base =
+    typeof r.redirect === "string" && r.redirect ? r.redirect : r.path;
+  if (!base) return "/";
+  if (base.startsWith("/")) return base;
+  if (parentPath && parentPath.endsWith("/")) return `${parentPath}${base}`;
   if (parentPath) return `${parentPath}/${base}`;
   return `/${base}`;
 }
@@ -66,21 +85,21 @@ function isActive(r: any, parentPath?: string) {
 
 async function handleLogout() {
   auth.logout();
-  await router.replace({ name: 'Login' });
+  await router.replace({ name: "Login" });
 }
 
 async function onSubNavigate(child: any, parentPath?: string) {
   try {
     const to = resolveTo(child, parentPath);
-    console.log('[Nav] navigate to:', to, 'from:', route.fullPath);
-    hovered.value = '';
+    console.log("[Nav] navigate to:", to, "from:", route.fullPath);
+    hovered.value = "";
     if (route.fullPath === to) {
       await router.replace({ path: to, hash: `#ts=${Date.now()}` });
     } else {
       await router.push(to);
     }
   } catch (e) {
-    console.error('子路由导航失败:', e);
+    console.error("子路由导航失败:", e);
   }
 }
 </script>
@@ -95,7 +114,11 @@ async function onSubNavigate(child: any, parentPath?: string) {
   align-items: center;
   padding: 10px 18px;
   backdrop-filter: blur(16px) saturate(180%);
-  background: linear-gradient(135deg, rgba(34, 40, 49, 0.85), rgba(24, 28, 38, 0.75));
+  background: linear-gradient(
+    135deg,
+    rgba(34, 40, 49, 0.85),
+    rgba(24, 28, 38, 0.75)
+  );
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
@@ -105,7 +128,14 @@ async function onSubNavigate(child: any, parentPath?: string) {
   position: absolute;
   inset: auto 0 0 0;
   height: 2px;
-  background: linear-gradient(90deg, transparent, #22d3ee, #3b82f6, #a855f7, transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #22d3ee,
+    #3b82f6,
+    #a855f7,
+    transparent
+  );
   background-size: 200% 100%;
   filter: drop-shadow(0 0 8px #22d3ee);
   animation: flow 3s linear infinite;
@@ -114,24 +144,28 @@ async function onSubNavigate(child: any, parentPath?: string) {
 .fx-glow {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.15), transparent 70%);
+  background: radial-gradient(
+    circle at 50% 0%,
+    rgba(59, 130, 246, 0.15),
+    transparent 70%
+  );
   pointer-events: none;
   z-index: -1;
 }
 
 @keyframes flow {
   0% {
-    opacity: .6;
+    opacity: 0.6;
     background-position: 0% 0;
   }
 
   50% {
-    opacity: .95;
+    opacity: 0.95;
     background-position: 100% 0;
   }
 
   100% {
-    opacity: .6;
+    opacity: 0.6;
     background-position: 0% 0;
   }
 }
@@ -185,7 +219,11 @@ async function onSubNavigate(child: any, parentPath?: string) {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(34, 211, 238, 0.2));
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.2),
+    rgba(34, 211, 238, 0.2)
+  );
   transform: scaleY(0);
   transform-origin: bottom;
   transition: transform 0.3s ease;
@@ -230,7 +268,11 @@ async function onSubNavigate(child: any, parentPath?: string) {
   padding: 12px 0;
   margin: 0;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(17, 24, 39, 0.95), rgba(17, 24, 39, 0.9));
+  background: linear-gradient(
+    135deg,
+    rgba(17, 24, 39, 0.95),
+    rgba(17, 24, 39, 0.9)
+  );
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
   display: none;
@@ -275,7 +317,11 @@ async function onSubNavigate(child: any, parentPath?: string) {
 }
 
 .sublink.active {
-  background: linear-gradient(90deg, rgba(59, 130, 246, 0.3), rgba(34, 211, 238, 0.3));
+  background: linear-gradient(
+    90deg,
+    rgba(59, 130, 246, 0.3),
+    rgba(34, 211, 238, 0.3)
+  );
   color: #ffffff;
 }
 
@@ -292,7 +338,11 @@ async function onSubNavigate(child: any, parentPath?: string) {
   gap: 8px;
   padding: 10px 16px;
   color: #e2e8f0;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(34, 211, 238, 0.2));
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.2),
+    rgba(34, 211, 238, 0.2)
+  );
   border: 1px solid rgba(148, 163, 184, 0.3);
   border-radius: 12px;
   cursor: pointer;
@@ -311,7 +361,11 @@ async function onSubNavigate(child: any, parentPath?: string) {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(34, 211, 238, 0.4));
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.4),
+    rgba(34, 211, 238, 0.4)
+  );
   transform: scaleX(0);
   transform-origin: right;
   transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
@@ -333,7 +387,12 @@ async function onSubNavigate(child: any, parentPath?: string) {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #6ee7ff, #3b82f6 60%, transparent 70%);
+  background: radial-gradient(
+    circle at 30% 30%,
+    #6ee7ff,
+    #3b82f6 60%,
+    transparent 70%
+  );
   box-shadow: 0 0 10px #60a5fa, 0 0 20px #22d3ee;
   animation: pulse 2s infinite;
   z-index: 2;

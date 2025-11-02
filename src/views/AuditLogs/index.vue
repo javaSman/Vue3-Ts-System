@@ -3,12 +3,8 @@
     <div class="header">
       <h1>操作日志审计</h1>
       <div class="header-actions">
-        <button class="btn btn-export" @click="exportLogs">
-          📥 导出日志
-        </button>
-        <button class="btn btn-refresh" @click="fetchLogs">
-          🔄 刷新
-        </button>
+        <button class="btn btn-export" @click="exportLogs">📥 导出日志</button>
+        <button class="btn btn-refresh" @click="fetchLogs">🔄 刷新</button>
       </div>
     </div>
 
@@ -54,12 +50,12 @@
       <div class="filter-row">
         <div class="filter-group">
           <label>开始日期</label>
-          <input type="date" v-model="filters.startDate">
+          <input type="date" v-model="filters.startDate" />
         </div>
 
         <div class="filter-group">
           <label>结束日期</label>
-          <input type="date" v-model="filters.endDate">
+          <input type="date" v-model="filters.endDate" />
         </div>
 
         <div class="filter-actions">
@@ -122,7 +118,11 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="log in logs" :key="log.id" :class="{ 'failed': log.status === 'failed' }">
+          <tr
+            v-for="log in logs"
+            :key="log.id"
+            :class="{ failed: log.status === 'failed' }"
+          >
             <td>{{ formatDateTime(log.timestamp) }}</td>
             <td>
               <div class="user-info">
@@ -131,24 +131,36 @@
               </div>
             </td>
             <td>
-              <span class="module-tag" :class="log.module">{{ getModuleName(log.module) }}</span>
+              <span class="module-tag" :class="log.module">{{
+                getModuleName(log.module)
+              }}</span>
             </td>
             <td>
-              <span class="action-tag" :class="log.action">{{ getActionName(log.action) }}</span>
+              <span class="action-tag" :class="log.action">{{
+                getActionName(log.action)
+              }}</span>
             </td>
             <td class="details">{{ log.details }}</td>
             <td>
               <span class="status-tag" :class="log.status">
-                {{ log.status === 'success' ? '✅ 成功' : '❌ 失败' }}
+                {{ log.status === "success" ? "✅ 成功" : "❌ 失败" }}
               </span>
             </td>
             <td>{{ formatIpAddress(log.ipAddress) }}</td>
             <td>
               <div class="operation-buttons">
-                <button class="btn btn-view" @click="viewIpDetails(log)" title="查看IP详情">
+                <button
+                  class="btn btn-view"
+                  @click="viewIpDetails(log)"
+                  title="查看IP详情"
+                >
                   👁️ 查看
                 </button>
-                <button class="btn btn-delete" @click="confirmDeleteLog(log)" title="删除此条日志">
+                <button
+                  class="btn btn-delete"
+                  @click="confirmDeleteLog(log)"
+                  title="删除此条日志"
+                >
                   🗑️ 删除
                 </button>
               </div>
@@ -168,31 +180,44 @@
         <div class="modal-body">
           <div class="ip-detail-item">
             <label>原始IP地址:</label>
-            <span class="ip-value">{{ selectedLog?.ipAddress || '未知' }}</span>
+            <span class="ip-value">{{ selectedLog?.ipAddress || "未知" }}</span>
           </div>
           <div class="ip-detail-item">
             <label>友好显示:</label>
-            <span class="ip-friendly">{{ formatIpAddress(selectedLog?.ipAddress) }}</span>
+            <span class="ip-friendly">{{
+              formatIpAddress(selectedLog?.ipAddress)
+            }}</span>
           </div>
           <div class="ip-detail-item">
             <label>地理位置:</label>
-            <span v-if="loadingLocation && !ipLocationCache[selectedLog?.ipAddress || '']" class="loading-text">
+            <span
+              v-if="
+                loadingLocation &&
+                !ipLocationCache[selectedLog?.ipAddress || '']
+              "
+              class="loading-text"
+            >
               🌍 正在定位...
             </span>
             <span v-else-if="selectedLog?.location" class="location-text">
               {{ selectedLog.location }}
             </span>
             <span v-else class="location-text">
-              {{ ipLocationCache[selectedLog?.ipAddress || ''] || getIpLocationSync(selectedLog?.ipAddress) }}
+              {{
+                ipLocationCache[selectedLog?.ipAddress || ""] ||
+                getIpLocationSync(selectedLog?.ipAddress)
+              }}
             </span>
           </div>
           <div class="ip-detail-item">
             <label>访问时间:</label>
-            <span>{{ formatDateTime(selectedLog?.timestamp || '') }}</span>
+            <span>{{ formatDateTime(selectedLog?.timestamp || "") }}</span>
           </div>
           <div class="ip-detail-item">
             <label>用户信息:</label>
-            <span>{{ selectedLog?.username }} (ID: {{ selectedLog?.userId }})</span>
+            <span
+              >{{ selectedLog?.username }} (ID: {{ selectedLog?.userId }})</span
+            >
           </div>
           <div class="ip-detail-item">
             <label>操作详情:</label>
@@ -217,18 +242,30 @@
             <div class="warning-icon">⚠️</div>
             <p>您确定要删除这条操作日志吗？</p>
             <div class="log-summary">
-              <p><strong>时间:</strong> {{ formatDateTime(selectedLog?.timestamp || '') }}</p>
+              <p>
+                <strong>时间:</strong>
+                {{ formatDateTime(selectedLog?.timestamp || "") }}
+              </p>
               <p><strong>用户:</strong> {{ selectedLog?.username }}</p>
-              <p><strong>操作:</strong> {{ getActionName(selectedLog?.action || '') }}</p>
+              <p>
+                <strong>操作:</strong>
+                {{ getActionName(selectedLog?.action || "") }}
+              </p>
               <p><strong>IP地址:</strong> {{ selectedLog?.ipAddress }}</p>
             </div>
             <p class="warning-text">此操作不可撤销，请谨慎操作！</p>
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-secondary" @click="closeDeleteModal">取消</button>
-          <button class="btn btn-danger" @click="deleteLog" :disabled="deleting">
-            {{ deleting ? '删除中...' : '确认删除' }}
+          <button class="btn btn-secondary" @click="closeDeleteModal">
+            取消
+          </button>
+          <button
+            class="btn btn-danger"
+            @click="deleteLog"
+            :disabled="deleting"
+          >
+            {{ deleting ? "删除中..." : "确认删除" }}
           </button>
         </div>
       </div>
@@ -238,25 +275,40 @@
     <div class="pagination" v-if="pagination.total > 0">
       <div class="pagination-info">
         显示第 {{ (pagination.page - 1) * pagination.limit + 1 }} -
-        {{ Math.min(pagination.page * pagination.limit, pagination.total) }} 条，
-        共 {{ pagination.total }} 条记录
+        {{
+          Math.min(pagination.page * pagination.limit, pagination.total)
+        }}
+        条， 共 {{ pagination.total }} 条记录
       </div>
 
       <div class="pagination-controls">
-        <button :disabled="pagination.page <= 1" @click="changePage(pagination.page - 1)" class="btn btn-page">
+        <button
+          :disabled="pagination.page <= 1"
+          @click="changePage(pagination.page - 1)"
+          class="btn btn-page"
+        >
           ← 上一页
         </button>
 
-        <span class="current-page">{{ pagination.page }} / {{ totalPages }}</span>
+        <span class="current-page"
+          >{{ pagination.page }} / {{ totalPages }}</span
+        >
 
-        <button :disabled="pagination.page >= totalPages" @click="changePage(pagination.page + 1)" class="btn btn-page">
+        <button
+          :disabled="pagination.page >= totalPages"
+          @click="changePage(pagination.page + 1)"
+          class="btn btn-page"
+        >
           下一页 →
         </button>
       </div>
     </div>
 
     <!-- 消息提示 -->
-    <div v-if="message.show" :class="['message-toast', `toast-${message.type}`]">
+    <div
+      v-if="message.show"
+      :class="['message-toast', `toast-${message.type}`]"
+    >
       <i :class="getMessageIcon(message.type)"></i>
       <span>{{ message.text }}</span>
       <!-- <button class="toast-close" @click="message.show = false">
@@ -267,10 +319,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
-import { fetchAuditLogs, fetchUserActionStats, exportAuditLogs, deleteAuditLog, type AuditLog } from '@/api/auditLog';
-import { fetchUsers } from '@/api/userManagement';
-import { useAuthStore } from '@/stores/auth';
+import { ref, onMounted, computed } from "vue";
+import {
+  fetchAuditLogs,
+  fetchUserActionStats,
+  exportAuditLogs,
+  deleteAuditLog,
+  type AuditLog,
+} from "@/api/auditLog";
+import { fetchUsers } from "@/api/userManagement";
+import { useAuthStore } from "@/stores/auth";
 
 // 响应式数据
 const logs = ref<AuditLog[]>([]);
@@ -291,24 +349,26 @@ const authStore = useAuthStore();
 
 // 筛选条件
 const filters = ref({
-  userId: '',
-  module: '',
-  action: '',
-  startDate: '',
-  endDate: ''
+  userId: "",
+  module: "",
+  action: "",
+  startDate: "",
+  endDate: "",
 });
 
 // 分页信息
 const pagination = ref({
   page: 1,
   limit: 20,
-  total: 0
+  total: 0,
 });
 
 // 计算属性
-const totalPages = computed(() => Math.ceil(pagination.value.total / pagination.value.limit));
+const totalPages = computed(() =>
+  Math.ceil(pagination.value.total / pagination.value.limit)
+);
 const uniqueUsers = computed(() => {
-  const userIds = new Set(logs.value.map(log => log.userId));
+  const userIds = new Set(logs.value.map((log) => log.userId));
   return Array.from(userIds);
 });
 
@@ -321,7 +381,7 @@ async function fetchLogs() {
       limit: pagination.value.limit,
       ...filters.value,
       // 修复：将 userId 转换为数字，如果为空则设为 undefined
-      userId: filters.value.userId ? Number(filters.value.userId) : undefined
+      userId: filters.value.userId ? Number(filters.value.userId) : undefined,
     };
 
     const response = await fetchAuditLogs(params);
@@ -330,7 +390,7 @@ async function fetchLogs() {
       pagination.value.total = response.data.total;
     }
   } catch (error) {
-    console.error('获取日志失败:', error);
+    console.error("获取日志失败:", error);
   } finally {
     loading.value = false;
   }
@@ -344,7 +404,7 @@ async function loadUsers() {
       users.value = response.data;
     }
   } catch (error) {
-    console.error('获取用户列表失败:', error);
+    console.error("获取用户列表失败:", error);
   }
 }
 
@@ -356,7 +416,7 @@ async function loadStats() {
       stats.value = response.data;
     }
   } catch (error) {
-    console.error('获取统计数据失败:', error);
+    console.error("获取统计数据失败:", error);
   }
 }
 
@@ -369,11 +429,11 @@ function applyFilters() {
 // 清空筛选条件
 function clearFilters() {
   filters.value = {
-    userId: '',
-    module: '',
-    action: '',
-    startDate: '',
-    endDate: ''
+    userId: "",
+    module: "",
+    action: "",
+    startDate: "",
+    endDate: "",
   };
   pagination.value.page = 1;
   fetchLogs();
@@ -392,36 +452,38 @@ async function exportLogs() {
       ...filters.value,
       // 修复：将 userId 转换为数字，如果为空则设为 undefined
       userId: filters.value.userId ? Number(filters.value.userId) : undefined,
-      format: 'xlsx'
+      format: "xlsx",
     });
 
     if (response.success && response.data) {
       // 创建下载链接
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = response.data.downloadUrl;
-      link.download = `audit_logs_${new Date().toISOString().split('T')[0]}.xlsx`;
+      link.download = `audit_logs_${
+        new Date().toISOString().split("T")[0]
+      }.xlsx`;
       link.click();
     }
   } catch (error) {
-    console.error('导出日志失败:', error);
+    console.error("导出日志失败:", error);
   }
 }
 
 // 格式化日期时间
 function formatDateTime(timestamp: string) {
-  return new Date(timestamp).toLocaleString('zh-CN');
+  return new Date(timestamp).toLocaleString("zh-CN");
 }
 
 // 获取模块名称
 function getModuleName(module: string) {
   const moduleNames: Record<string, string> = {
-    auth: '认证',
-    user: '用户管理',
-    profile: '个人资料',
-    permission: '权限管理',
-    system: '系统设置',
-    audit: '操作日志',
-    data: '数据管理'
+    auth: "认证",
+    user: "用户管理",
+    profile: "个人资料",
+    permission: "权限管理",
+    system: "系统设置",
+    audit: "操作日志",
+    data: "数据管理",
   };
   return moduleNames[module] || module;
 }
@@ -429,27 +491,27 @@ function getModuleName(module: string) {
 // 获取操作名称
 function getActionName(action: string) {
   const actionNames: Record<string, string> = {
-    login: '登录',
-    logout: '退出',
-    create: '创建',
-    update: '更新',
-    delete: '删除',
-    view: '查看'
+    login: "登录",
+    logout: "退出",
+    create: "创建",
+    update: "更新",
+    delete: "删除",
+    view: "查看",
   };
   return actionNames[action] || action;
 }
 
 // 格式化IP地址显示
 function formatIpAddress(ip: string | undefined) {
-  if (!ip) return '-';
+  if (!ip) return "-";
 
   // 将::1显示为更友好的格式
-  if (ip === '::1') {
-    return '127.0.0.1 (本地)';
+  if (ip === "::1") {
+    return "127.0.0.1 (本地)";
   }
 
-  if (ip === '127.0.0.1') {
-    return '127.0.0.1 (本地)';
+  if (ip === "127.0.0.1") {
+    return "127.0.0.1 (本地)";
   }
 
   return ip;
@@ -457,10 +519,10 @@ function formatIpAddress(ip: string | undefined) {
 
 // 获取IP地理位置（集成真实API）
 async function getIpLocation(ip: string | undefined): Promise<string> {
-  if (!ip) return '未知';
+  if (!ip) return "未知";
 
-  if (ip === '::1' || ip === '127.0.0.1' || ip.includes('127.0.0.1')) {
-    return '本地主机';
+  if (ip === "::1" || ip === "127.0.0.1" || ip.includes("127.0.0.1")) {
+    return "本地主机";
   }
 
   try {
@@ -468,28 +530,28 @@ async function getIpLocation(ip: string | undefined): Promise<string> {
     const response = await fetch(`http://ip-api.com/json/${ip}?lang=zh-CN`);
     const data = await response.json();
 
-    if (data.status === 'success') {
+    if (data.status === "success") {
       const { country, regionName, city, isp } = data;
       return `${country} ${regionName} ${city} (${isp})`;
     } else {
-      return '未知位置';
+      return "未知位置";
     }
   } catch (error) {
-    console.error('获取IP地理位置失败:', error);
-    return '获取失败';
+    console.error("获取IP地理位置失败:", error);
+    return "获取失败";
   }
 }
 
 // 获取IP地理位置（模拟，如果API不可用）
 function getIpLocationSync(ip: string | undefined) {
-  if (!ip) return '未知';
+  if (!ip) return "未知";
 
-  if (ip === '::1' || ip === '127.0.0.1' || ip.includes('127.0.0.1')) {
-    return '本地主机';
+  if (ip === "::1" || ip === "127.0.0.1" || ip.includes("127.0.0.1")) {
+    return "本地主机";
   }
 
   // 这里可以集成真实的IP地理位置服务
-  return '未知位置';
+  return "未知位置";
 }
 
 // 查看IP详情
@@ -501,11 +563,11 @@ async function viewIpDetails(log: AuditLog) {
   if (log.ipAddress && !ipLocationCache.value[log.ipAddress]) {
     loadingLocation.value = true;
     try {
-      const location = await getIpLocation(log.ipAddress.split(' ')[0]); // 去掉 (本地) 等后缀
+      const location = await getIpLocation(log.ipAddress.split(" ")[0]); // 去掉 (本地) 等后缀
       ipLocationCache.value[log.ipAddress] = location;
     } catch (error) {
-      console.error('获取IP位置失败:', error);
-      ipLocationCache.value[log.ipAddress] = '获取失败';
+      console.error("获取IP位置失败:", error);
+      ipLocationCache.value[log.ipAddress] = "获取失败";
     } finally {
       loadingLocation.value = false;
     }
@@ -520,11 +582,11 @@ function closeIpModal() {
 
 // 确认删除日志
 function confirmDeleteLog(log: AuditLog) {
-  if (authStore.userInfo?.username === 'guest') {
+  if (authStore.userInfo?.username === "guest") {
     selectedLog.value = log;
     showDeleteModal.value = true;
   } else {
-    showMessage("您没有权限删除日志", "info")
+    showMessage("您没有权限删除日志", "info");
   }
 }
 // 关闭删除确认弹窗
@@ -532,7 +594,6 @@ function closeDeleteModal() {
   showDeleteModal.value = false;
   selectedLog.value = null;
 }
-
 
 // 删除日志
 async function deleteLog() {
@@ -544,10 +605,12 @@ async function deleteLog() {
     const response = await deleteAuditLog(selectedLog.value.id);
 
     if (response.success) {
-      console.log('日志删除成功:', response.message);
-      showMessage("日志删除成功", "success")
+      console.log("日志删除成功:", response.message);
+      showMessage("日志删除成功", "success");
       // 从列表中移除
-      const index = logs.value.findIndex(log => log.id === selectedLog.value?.id);
+      const index = logs.value.findIndex(
+        (log) => log.id === selectedLog.value?.id
+      );
       if (index > -1) {
         logs.value.splice(index, 1);
         pagination.value.total -= 1;
@@ -555,24 +618,23 @@ async function deleteLog() {
 
       closeDeleteModal();
 
-
       // 重新加载数据以确保一致性
       await fetchLogs();
       await loadStats(); // 更新统计数据
     } else {
-      console.error('删除失败:', response.message);
-      showMessage(response.message, "error")
+      console.error("删除失败:", response.message);
+      showMessage(response.message, "error");
     }
   } catch (error) {
-    console.error('删除日志失败:', error);
-    showMessage("删除日志失败", "error")
+    console.error("删除日志失败:", error);
+    showMessage("删除日志失败", "error");
   } finally {
     deleting.value = false;
   }
 }
 
 // 定义消息类型
-type MessageType = 'success' | 'error' | 'warning' | 'info';
+type MessageType = "success" | "error" | "warning" | "info";
 
 // 定义消息对象接口
 interface Message {
@@ -583,16 +645,20 @@ interface Message {
 
 const message = ref<Message>({
   show: false,
-  text: '',
-  type: 'info'
+  text: "",
+  type: "info",
 });
 
 // 消息提示函数 - 添加参数类型注解
-function showMessage(text: string, type: MessageType = 'info', duration = 3000) {
+function showMessage(
+  text: string,
+  type: MessageType = "info",
+  duration = 3000
+) {
   message.value = {
     show: true,
     text,
-    type
+    type,
   };
 
   setTimeout(() => {
@@ -603,10 +669,10 @@ function showMessage(text: string, type: MessageType = 'info', duration = 3000) 
 // 获取消息图标 - 添加参数类型注解和返回类型
 function getMessageIcon(type: MessageType): string {
   const icons: Record<MessageType, string> = {
-    success: 'icon-check',
-    error: 'icon-error',
-    warning: 'icon-warning',
-    info: 'icon-info'
+    success: "icon-check",
+    error: "icon-error",
+    warning: "icon-warning",
+    info: "icon-info",
   };
   return icons[type];
 }

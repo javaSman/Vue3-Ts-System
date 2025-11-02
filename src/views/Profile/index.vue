@@ -6,13 +6,20 @@
     </div>
 
     <!-- 自定义弹窗 -->
-    <div v-if="showMessageModal" class="modal-overlay" @click="closeMessageModal">
+    <div
+      v-if="showMessageModal"
+      class="modal-overlay"
+      @click="closeMessageModal"
+    >
       <div class="message-modal" @click.stop>
         <div class="message-header">
-          <span class="message-icon" :class="messageType === 'success' ? 'success' : 'error'">
-            {{ messageType === 'success' ? '✅' : '❌' }}
+          <span
+            class="message-icon"
+            :class="messageType === 'success' ? 'success' : 'error'"
+          >
+            {{ messageType === "success" ? "✅" : "❌" }}
           </span>
-          <h3>{{ messageType === 'success' ? '成功' : '错误' }}</h3>
+          <h3>{{ messageType === "success" ? "成功" : "错误" }}</h3>
         </div>
         <div class="message-content">
           <p>{{ message }}</p>
@@ -36,8 +43,15 @@
         <div class="avatar-section">
           <div class="avatar-container">
             <div class="avatar-upload">
-              <div class="avatar-display" @click="triggerFileInput"
-                :style="{ backgroundImage: displayAvatar ? `url(${displayAvatar})` : 'none' }">
+              <div
+                class="avatar-display"
+                @click="triggerFileInput"
+                :style="{
+                  backgroundImage: displayAvatar
+                    ? `url(${displayAvatar})`
+                    : 'none',
+                }"
+              >
                 <div v-if="displayAvatar" class="avatar-image">
                   <!-- 头像图片 -->
                 </div>
@@ -45,7 +59,12 @@
                   <span>{{ userInitials }}</span>
                 </div>
                 <div class="avatar-overlay">
-                  <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <svg
+                    class="upload-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                  >
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                     <polyline points="7,10 12,15 17,10"></polyline>
                     <line x1="12" y1="15" x2="12" y2="3"></line>
@@ -53,7 +72,13 @@
                   <span class="upload-text">点击上传</span>
                 </div>
               </div>
-              <input ref="fileInputRef" type="file" accept="image/*" @change="handleFileSelect" style="display: none" />
+              <input
+                ref="fileInputRef"
+                type="file"
+                accept="image/*"
+                @change="handleFileSelect"
+                style="display: none"
+              />
             </div>
             <!-- <button 
               class="btn-change-avatar" 
@@ -75,16 +100,21 @@
           <div v-if="previewAvatar" class="avatar-preview-section">
             <h4>头像预览</h4>
             <div class="preview-container">
-              <div class="preview-avatar" :style="{ backgroundImage: `url(${previewAvatar})` }">
+              <div
+                class="preview-avatar"
+                :style="{ backgroundImage: `url(${previewAvatar})` }"
+              >
                 <!-- 预览头像 -->
               </div>
               <div class="preview-actions">
-                <button class="btn-confirm" @click="confirmAvatar" :disabled="avatarUploading">
+                <button
+                  class="btn-confirm"
+                  @click="confirmAvatar"
+                  :disabled="avatarUploading"
+                >
                   确认使用
                 </button>
-                <button class="btn-cancel" @click="cancelPreview">
-                  取消
-                </button>
+                <button class="btn-cancel" @click="cancelPreview">取消</button>
               </div>
             </div>
           </div>
@@ -117,11 +147,15 @@
 
             <div class="form-group">
               <label>个人简介</label>
-              <textarea v-model="userForm.bio" rows="3" placeholder="介绍一下你自己..."></textarea>
+              <textarea
+                v-model="userForm.bio"
+                rows="3"
+                placeholder="介绍一下你自己..."
+              ></textarea>
             </div>
 
             <button type="submit" class="btn-save" :disabled="saving">
-              {{ saving ? '保存中...' : '保存更改' }}
+              {{ saving ? "保存中..." : "保存更改" }}
             </button>
           </form>
         </div>
@@ -134,7 +168,10 @@
             <h4>密码</h4>
             <p>上次修改时间：{{ formatDate(lastPasswordChange) }}</p>
           </div>
-          <button class="btn-change-password" @click="showChangePassword = true">
+          <button
+            class="btn-change-password"
+            @click="showChangePassword = true"
+          >
             修改密码
           </button>
         </div>
@@ -157,25 +194,41 @@
       <div class="modal-content">
         <div class="modal-header">
           <h3>修改密码</h3>
-          <button class="close-btn" @click="showChangePassword = false">&times;</button>
+          <button class="close-btn" @click="showChangePassword = false">
+            &times;
+          </button>
         </div>
         <form @submit.prevent="changePassword">
           <div class="form-group">
             <label>当前密码</label>
-            <input v-model="passwordForm.currentPassword" type="password" required />
+            <input
+              v-model="passwordForm.currentPassword"
+              type="password"
+              required
+            />
           </div>
           <div class="form-group">
             <label>新密码</label>
-            <input v-model="passwordForm.newPassword" type="password" required />
+            <input
+              v-model="passwordForm.newPassword"
+              type="password"
+              required
+            />
           </div>
           <div class="form-group">
             <label>确认新密码</label>
-            <input v-model="passwordForm.confirmPassword" type="password" required />
+            <input
+              v-model="passwordForm.confirmPassword"
+              type="password"
+              required
+            />
           </div>
           <div class="form-actions">
-            <button type="button" @click="showChangePassword = false">取消</button>
+            <button type="button" @click="showChangePassword = false">
+              取消
+            </button>
             <button type="submit" :disabled="changingPassword">
-              {{ changingPassword ? '修改中...' : '确认修改' }}
+              {{ changingPassword ? "修改中..." : "确认修改" }}
             </button>
           </div>
         </form>
@@ -185,9 +238,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import { useAuthStore } from '@/stores/auth';
-import { fetchUserProfile, updateUserProfile, changeUserPassword, uploadUserAvatarFile } from '@/api/profile';
+import { ref, computed, onMounted } from "vue";
+import { useAuthStore } from "@/stores/auth";
+import {
+  fetchUserProfile,
+  updateUserProfile,
+  changeUserPassword,
+  uploadUserAvatarFile,
+} from "@/api/profile";
 
 interface UserForm {
   username: string;
@@ -214,11 +272,11 @@ interface AvatarUploadResponse {
 
 // 消息弹窗相关状态
 const showMessageModal = ref(false);
-const message = ref('');
-const messageType = ref<'success' | 'error'>('success');
+const message = ref("");
+const messageType = ref<"success" | "error">("success");
 
 // 显示消息弹窗
-function showMessage(msg: string, type: 'success' | 'error' = 'success') {
+function showMessage(msg: string, type: "success" | "error" = "success") {
   message.value = msg;
   messageType.value = type;
   showMessageModal.value = true;
@@ -227,30 +285,30 @@ function showMessage(msg: string, type: 'success' | 'error' = 'success') {
 // 关闭消息弹窗
 function closeMessageModal() {
   showMessageModal.value = false;
-  message.value = '';
-  messageType.value = 'success';
+  message.value = "";
+  messageType.value = "success";
 }
 
 // 其他状态
 const authStore = useAuthStore();
 const userForm = ref<UserForm>({
-  username: '',
-  email: '',
-  fullName: '',
-  phone: '',
-  bio: ''
+  username: "",
+  email: "",
+  fullName: "",
+  phone: "",
+  bio: "",
 });
 const passwordForm = ref<PasswordForm>({
-  currentPassword: '',
-  newPassword: '',
-  confirmPassword: ''
+  currentPassword: "",
+  newPassword: "",
+  confirmPassword: "",
 });
 const saving = ref(false);
 const changingPassword = ref(false);
 const showChangePassword = ref(false);
 const twoFactorEnabled = ref(false);
 const loading = ref(false);
-const lastPasswordChange = ref('');
+const lastPasswordChange = ref("");
 const fileInputRef = ref<HTMLInputElement | null>(null);
 
 // 头像相关状态
@@ -262,9 +320,13 @@ const currentAvatar = ref<string | null>(null);
 
 const userInitials = computed(() => {
   if (userForm.value.fullName) {
-    return userForm.value.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
+    return userForm.value.fullName
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
   }
-  return userForm.value.username?.slice(0, 2).toUpperCase() || 'US';
+  return userForm.value.username?.slice(0, 2).toUpperCase() || "US";
 });
 
 const displayAvatar = computed(() => {
@@ -290,14 +352,14 @@ function handleFileSelect(event: Event) {
   if (!file) return;
 
   // 验证文件类型
-  if (!file.type.startsWith('image/')) {
-    showMessage('请选择图片文件', 'error');
+  if (!file.type.startsWith("image/")) {
+    showMessage("请选择图片文件", "error");
     return;
   }
 
   // 验证文件大小 (限制为 2MB)
   if (file.size > 2 * 1024 * 1024) {
-    showMessage('图片大小不能超过 2MB', 'error');
+    showMessage("图片大小不能超过 2MB", "error");
     return;
   }
 
@@ -319,15 +381,18 @@ async function confirmAvatar() {
 
   avatarUploading.value = true;
   try {
-    console.log('📸 开始上传头像文件...', avatarFile.value.name);
+    console.log("📸 开始上传头像文件...", avatarFile.value.name);
 
     // 使用新的文件上传API
-    const result = await uploadUserAvatarFile(authStore.userInfo!.id, avatarFile.value);
+    const result = await uploadUserAvatarFile(
+      authStore.userInfo!.id,
+      avatarFile.value
+    );
 
-    console.log('📋 头像上传API响应:', result);
+    console.log("📋 头像上传API响应:", result);
 
     if (result.success) {
-      showMessage('头像上传成功！');
+      showMessage("头像上传成功！");
       avatarUrl.value = result.data?.avatarUrl || null;
       currentAvatar.value = result.data?.avatarUrl || null;
       previewAvatar.value = null;
@@ -336,13 +401,13 @@ async function confirmAvatar() {
       // 重新加载用户资料以获取最新数据
       await loadUserProfile();
 
-      console.log('✅ 头像上传完成，文件大小:', result.data?.size, 'bytes');
+      console.log("✅ 头像上传完成，文件大小:", result.data?.size, "bytes");
     } else {
-      showMessage(result.message || '头像上传失败', 'error');
+      showMessage(result.message || "头像上传失败", "error");
     }
   } catch (error) {
-    console.error('上传头像失败:', error);
-    showMessage('头像上传失败，请重试', 'error');
+    console.error("上传头像失败:", error);
+    showMessage("头像上传失败，请重试", "error");
   } finally {
     avatarUploading.value = false;
   }
@@ -354,55 +419,56 @@ function cancelPreview() {
   avatarFile.value = null;
   // 清理文件输入框
   if (fileInputRef.value) {
-    fileInputRef.value.value = '';
+    fileInputRef.value.value = "";
   }
 }
 
 // 加载用户资料
 async function loadUserProfile() {
   if (!authStore.userInfo?.id) {
-    console.warn('用户未登录，无法加载资料');
+    console.warn("用户未登录，无法加载资料");
     return;
   }
 
   try {
     loading.value = true;
-    console.log('🔄 开始加载用户资料...', authStore.userInfo.id);
+    console.log("🔄 开始加载用户资料...", authStore.userInfo.id);
 
     const result = await fetchUserProfile(authStore.userInfo.id);
-    console.log('📋 用户资料API响应:', result);
+    console.log("📋 用户资料API响应:", result);
 
     if (result.success && result.data) {
       userForm.value = {
         username: result.data.username,
         email: result.data.email,
-        fullName: result.data.profile.fullName || '',
-        phone: result.data.profile.phone || '',
-        bio: result.data.profile.bio || ''
+        fullName: result.data.profile.fullName || "",
+        phone: result.data.profile.phone || "",
+        bio: result.data.profile.bio || "",
       };
       twoFactorEnabled.value = result.data.profile.twoFactorEnabled || false;
-      lastPasswordChange.value = result.data.profile.lastPasswordChange || '';
+      lastPasswordChange.value = result.data.profile.lastPasswordChange || "";
 
       // 设置头像URL，优先使用avatarUrl，其次使用avatar
-      const profileAvatarUrl = result.data.profile.avatarUrl || result.data.profile.avatar;
+      const profileAvatarUrl =
+        result.data.profile.avatarUrl || result.data.profile.avatar;
       if (profileAvatarUrl) {
         currentAvatar.value = profileAvatarUrl;
         avatarUrl.value = profileAvatarUrl;
-        console.log('✅ 头像加载成功:', profileAvatarUrl);
+        console.log("✅ 头像加载成功:", profileAvatarUrl);
       } else {
         currentAvatar.value = null;
         avatarUrl.value = null;
-        console.log('📝 用户未设置头像');
+        console.log("📝 用户未设置头像");
       }
 
-      console.log('✅ 用户资料加载成功');
+      console.log("✅ 用户资料加载成功");
     } else {
-      console.error('❌ API返回错误:', result.message);
-      showMessage(result.message || '获取用户资料失败', 'error');
+      console.error("❌ API返回错误:", result.message);
+      showMessage(result.message || "获取用户资料失败", "error");
     }
   } catch (error) {
-    console.error('😨 获取用户资料异常:', error);
-    showMessage('获取用户资料失败，请检查网络连接', 'error');
+    console.error("😨 获取用户资料异常:", error);
+    showMessage("获取用户资料失败，请检查网络连接", "error");
   } finally {
     loading.value = false;
   }
@@ -411,33 +477,33 @@ async function loadUserProfile() {
 // 更新个人资料
 async function updateProfile() {
   if (!authStore.userInfo?.id) {
-    showMessage('用户未登录', 'error');
+    showMessage("用户未登录", "error");
     return;
   }
 
   saving.value = true;
   try {
-    console.log('✏️ 开始更新资料:', userForm.value);
+    console.log("✏️ 开始更新资料:", userForm.value);
 
     const result = await updateUserProfile(authStore.userInfo.id, {
       email: userForm.value.email,
       fullName: userForm.value.fullName,
       phone: userForm.value.phone,
       bio: userForm.value.bio,
-      twoFactorEnabled: twoFactorEnabled.value
+      twoFactorEnabled: twoFactorEnabled.value,
     });
 
-    console.log('📋 更新资料API响应:', result);
+    console.log("📋 更新资料API响应:", result);
 
     if (result.success) {
-      showMessage('资料更新成功！');
+      showMessage("资料更新成功！");
     } else {
-      console.error('❌ API返回错误:', result.message);
-      showMessage(result.message || '更新失败，请重试', 'error');
+      console.error("❌ API返回错误:", result.message);
+      showMessage(result.message || "更新失败，请重试", "error");
     }
   } catch (error) {
-    console.error('😨 更新失败:', error);
-    showMessage('更新失败，请重试', 'error');
+    console.error("😨 更新失败:", error);
+    showMessage("更新失败，请重试", "error");
   } finally {
     saving.value = false;
   }
@@ -446,45 +512,49 @@ async function updateProfile() {
 // 修改密码
 async function changePassword() {
   if (passwordForm.value.newPassword !== passwordForm.value.confirmPassword) {
-    showMessage('两次输入的新密码不一致', 'error');
+    showMessage("两次输入的新密码不一致", "error");
     return;
   }
 
   if (passwordForm.value.newPassword.length < 6) {
-    showMessage('新密码长度至少6位', 'error');
+    showMessage("新密码长度至少6位", "error");
     return;
   }
 
   if (!authStore.userInfo?.id) {
-    showMessage('用户未登录', 'error');
+    showMessage("用户未登录", "error");
     return;
   }
 
   changingPassword.value = true;
   try {
-    console.log('🔒 开始修改密码...');
+    console.log("🔒 开始修改密码...");
 
     const result = await changeUserPassword(authStore.userInfo.id, {
       currentPassword: passwordForm.value.currentPassword,
-      newPassword: passwordForm.value.newPassword
+      newPassword: passwordForm.value.newPassword,
     });
 
-    console.log('📋 修改密码API响应:', result);
+    console.log("📋 修改密码API响应:", result);
 
     if (result.success) {
-      showMessage('密码修改成功！');
+      showMessage("密码修改成功！");
       showChangePassword.value = false;
-      passwordForm.value = { currentPassword: '', newPassword: '', confirmPassword: '' };
+      passwordForm.value = {
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      };
       if (result.data?.lastPasswordChange) {
         lastPasswordChange.value = result.data.lastPasswordChange;
       }
     } else {
-      console.error('❌ API返回错误:', result.message);
-      showMessage(result.message || '修改失败，请重试', 'error');
+      console.error("❌ API返回错误:", result.message);
+      showMessage(result.message || "修改失败，请重试", "error");
     }
   } catch (error) {
-    console.error('😨 修改失败:', error);
-    showMessage('修改失败，请重试', 'error');
+    console.error("😨 修改失败:", error);
+    showMessage("修改失败，请重试", "error");
   } finally {
     changingPassword.value = false;
   }
@@ -492,12 +562,12 @@ async function changePassword() {
 
 // 格式化日期
 function formatDate(dateString: string) {
-  if (!dateString) return '未知';
+  if (!dateString) return "未知";
   const date = new Date(dateString);
-  return date.toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
+  return date.toLocaleDateString("zh-CN", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
   });
 }
 
@@ -1068,7 +1138,7 @@ onMounted(() => {
   right: 0;
   bottom: 0;
   background-color: #ccc;
-  transition: .4s;
+  transition: 0.4s;
   border-radius: 24px;
 }
 
@@ -1080,15 +1150,15 @@ onMounted(() => {
   left: 3px;
   bottom: 3px;
   background-color: white;
-  transition: .4s;
+  transition: 0.4s;
   border-radius: 50%;
 }
 
-input:checked+.slider {
+input:checked + .slider {
   background-color: #4caf50;
 }
 
-input:checked+.slider:before {
+input:checked + .slider:before {
   transform: translateX(26px);
 }
 

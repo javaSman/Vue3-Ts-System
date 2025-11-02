@@ -19,12 +19,16 @@
     </div>
 
     <div class="device-grid">
-      <div v-for="device in paginatedDevices" :key="device.id" class="device-card"
-        :class="{ 'online': device.status === 'online' }">
+      <div
+        v-for="device in paginatedDevices"
+        :key="device.id"
+        class="device-card"
+        :class="{ online: device.status === 'online' }"
+      >
         <div class="card-header">
           <h3>{{ device.name }}</h3>
           <span class="status-badge" :class="device.status">
-            {{ device.status === 'online' ? '在线' : '离线' }}
+            {{ device.status === "online" ? "在线" : "离线" }}
           </span>
         </div>
 
@@ -51,28 +55,40 @@
               <div class="metric-label">CPU</div>
               <div class="metric-value">{{ device.cpu }}%</div>
               <div class="progress-bar">
-                <div class="progress-fill" :style="{ width: device.cpu + '%' }"></div>
+                <div
+                  class="progress-fill"
+                  :style="{ width: device.cpu + '%' }"
+                ></div>
               </div>
             </div>
             <div class="metric-item">
               <div class="metric-label">内存</div>
               <div class="metric-value">{{ device.memory }}%</div>
               <div class="progress-bar">
-                <div class="progress-fill" :style="{ width: device.memory + '%' }"></div>
+                <div
+                  class="progress-fill"
+                  :style="{ width: device.memory + '%' }"
+                ></div>
               </div>
             </div>
             <div class="metric-item">
               <div class="metric-label">电池</div>
               <div class="metric-value">{{ device.battery }}%</div>
               <div class="progress-bar">
-                <div class="progress-fill" :style="{ width: device.battery + '%' }"></div>
+                <div
+                  class="progress-fill"
+                  :style="{ width: device.battery + '%' }"
+                ></div>
               </div>
             </div>
             <div class="metric-item">
               <div class="metric-label">信号</div>
               <div class="metric-value">{{ device.signal }}%</div>
               <div class="progress-bar">
-                <div class="progress-fill" :style="{ width: device.signal + '%' }"></div>
+                <div
+                  class="progress-fill"
+                  :style="{ width: device.signal + '%' }"
+                ></div>
               </div>
             </div>
             <div class="metric-item">
@@ -83,13 +99,18 @@
               <div class="metric-label">磁盘</div>
               <div class="metric-value">{{ device.disk }}%</div>
               <div class="progress-bar">
-                <div class="progress-fill" :style="{ width: device.disk + '%' }"></div>
+                <div
+                  class="progress-fill"
+                  :style="{ width: device.disk + '%' }"
+                ></div>
               </div>
             </div>
           </div>
 
           <div class="action-buttons">
-            <button class="btn-details" @click="showDetails(device)">详情</button>
+            <button class="btn-details" @click="showDetails(device)">
+              详情
+            </button>
             <button class="btn-restart">重启</button>
           </div>
         </div>
@@ -99,14 +120,23 @@
     <!-- 分页控件 -->
     <div class="pagination-controls">
       <div class="pagination-info">
-        显示第 {{ startIndex + 1 }}-{{ endIndex }} 条，共 {{ filteredDevices.length }} 条
+        显示第 {{ startIndex + 1 }}-{{ endIndex }} 条，共
+        {{ filteredDevices.length }} 条
       </div>
       <div class="pagination-buttons">
-        <button @click="prevPage" :disabled="currentPage === 1" class="pagination-btn">
+        <button
+          @click="prevPage"
+          :disabled="currentPage === 1"
+          class="pagination-btn"
+        >
           上一页
         </button>
         <span class="page-indicator">第 {{ currentPage }} 页</span>
-        <button @click="nextPage" :disabled="currentPage >= totalPages" class="pagination-btn">
+        <button
+          @click="nextPage"
+          :disabled="currentPage >= totalPages"
+          class="pagination-btn"
+        >
           下一页
         </button>
       </div>
@@ -129,7 +159,11 @@
           <button class="close-btn" @click="closeModal">×</button>
         </div>
         <div class="modal-body">
-          <div v-for="(value, key) in displayDeviceData" :key="key" class="detail-row">
+          <div
+            v-for="(value, key) in displayDeviceData"
+            :key="key"
+            class="detail-row"
+          >
             <label class="detail-label">{{ getLabelText(key) }}:</label>
             <input type="text" :value="value" readonly class="detail-input" />
           </div>
@@ -140,303 +174,307 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from "vue";
 
 interface Device {
-  id: string
-  name: string
-  type: string
-  version: string
-  ip: string
-  mac: string
-  status: 'online' | 'offline'
-  cpu: number
-  memory: number
-  disk: number
-  battery: number
-  signal: number
-  temperature: number
+  id: string;
+  name: string;
+  type: string;
+  version: string;
+  ip: string;
+  mac: string;
+  status: "online" | "offline";
+  cpu: number;
+  memory: number;
+  disk: number;
+  battery: number;
+  signal: number;
+  temperature: number;
 }
 
 // 模拟设备数据
 const devices = ref<Device[]>([
   {
-    id: '1',
-    name: 'DEVICE_FG8BSDD6',
-    type: '服务器',
-    version: 'v4.2.1',
-    ip: '192.168.1.101',
-    mac: '00:1A:2B:3C:4D:5E',
-    status: 'online',
+    id: "1",
+    name: "DEVICE_FG8BSDD6",
+    type: "服务器",
+    version: "v4.2.1",
+    ip: "192.168.1.101",
+    mac: "00:1A:2B:3C:4D:5E",
+    status: "online",
     cpu: 47,
     memory: 57,
     disk: 57,
     battery: 6,
     signal: 55,
-    temperature: 51
+    temperature: 51,
   },
   {
-    id: '2',
-    name: 'DEVICE_8880DF06',
-    type: '网络设备',
-    version: 'v3.1.5',
-    ip: '192.168.1.102',
-    mac: '00:1B:2C:3D:4E:5F',
-    status: 'online',
+    id: "2",
+    name: "DEVICE_8880DF06",
+    type: "网络设备",
+    version: "v3.1.5",
+    ip: "192.168.1.102",
+    mac: "00:1B:2C:3D:4E:5F",
+    status: "online",
     cpu: 53,
     memory: 52,
     disk: 52,
     battery: 9,
     signal: 34,
-    temperature: 57
+    temperature: 57,
   },
   {
-    id: '3',
-    name: 'DEVICE_PERSISTENCE_TEST',
-    type: '存储设备',
-    version: 'v2.0.8',
-    ip: '192.168.1.103',
-    mac: '00:1C:2D:3E:4F:60',
-    status: 'online',
+    id: "3",
+    name: "DEVICE_PERSISTENCE_TEST",
+    type: "存储设备",
+    version: "v2.0.8",
+    ip: "192.168.1.103",
+    mac: "00:1C:2D:3E:4F:60",
+    status: "online",
     cpu: 67,
     memory: 63,
     disk: 63,
     battery: 46,
     signal: 78,
-    temperature: 46
+    temperature: 46,
   },
   {
-    id: '4',
-    name: 'DEVICE_ESF6C18B',
-    type: '安全设备',
-    version: 'v5.3.2',
-    ip: '192.168.1.104',
-    mac: '00:1D:2E:3F:50:61',
-    status: 'online',
+    id: "4",
+    name: "DEVICE_ESF6C18B",
+    type: "安全设备",
+    version: "v5.3.2",
+    ip: "192.168.1.104",
+    mac: "00:1D:2E:3F:50:61",
+    status: "online",
     cpu: 96,
     memory: 40,
     disk: 40,
     battery: 37,
     signal: 32,
-    temperature: 31
+    temperature: 31,
   },
   {
-    id: '5',
-    name: 'DEVICE_49257G87',
-    type: '终端设备',
-    version: 'v1.2.0',
-    ip: '192.168.1.105',
-    mac: '00:1E:2F:40:51:62',
-    status: 'offline',
+    id: "5",
+    name: "DEVICE_49257G87",
+    type: "终端设备",
+    version: "v1.2.0",
+    ip: "192.168.1.105",
+    mac: "00:1E:2F:40:51:62",
+    status: "offline",
     cpu: 42,
     memory: 68,
     disk: 68,
     battery: 21,
     signal: 27,
-    temperature: 24
+    temperature: 24,
   },
   {
-    id: '6',
-    name: 'DEVICE_A1B2C3D4',
-    type: 'IoT设备',
-    version: 'v2.5.3',
-    ip: '192.168.1.106',
-    mac: '00:1F:30:41:52:63',
-    status: 'online',
+    id: "6",
+    name: "DEVICE_A1B2C3D4",
+    type: "IoT设备",
+    version: "v2.5.3",
+    ip: "192.168.1.106",
+    mac: "00:1F:30:41:52:63",
+    status: "online",
     cpu: 62,
     memory: 30,
     disk: 30,
     battery: 29,
     signal: 33,
-    temperature: 37
+    temperature: 37,
   },
   {
-    id: '7',
-    name: 'DEVICE_TEST001',
-    type: '测试设备',
-    version: 'v0.9.5',
-    ip: '192.168.1.107',
-    mac: '00:20:31:42:53:64',
-    status: 'offline',
+    id: "7",
+    name: "DEVICE_TEST001",
+    type: "测试设备",
+    version: "v0.9.5",
+    ip: "192.168.1.107",
+    mac: "00:20:31:42:53:64",
+    status: "offline",
     cpu: 15,
     memory: 25,
     disk: 25,
     battery: 80,
     signal: 0,
-    temperature: 22
+    temperature: 22,
   },
   {
-    id: '8',
-    name: 'DEVICE_PROD_SVR',
-    type: '生产服务器',
-    version: 'v4.5.0',
-    ip: '192.168.1.108',
-    mac: '00:21:32:43:54:65',
-    status: 'online',
+    id: "8",
+    name: "DEVICE_PROD_SVR",
+    type: "生产服务器",
+    version: "v4.5.0",
+    ip: "192.168.1.108",
+    mac: "00:21:32:43:54:65",
+    status: "online",
     cpu: 78,
     memory: 82,
     disk: 82,
     battery: 5,
     signal: 92,
-    temperature: 65
+    temperature: 65,
   },
   {
-    id: '9',
-    name: 'DEVICE_BACKUP_NAS',
-    type: 'NAS存储',
-    version: 'v3.7.1',
-    ip: '192.168.1.109',
-    mac: '00:22:33:44:55:66',
-    status: 'online',
+    id: "9",
+    name: "DEVICE_BACKUP_NAS",
+    type: "NAS存储",
+    version: "v3.7.1",
+    ip: "192.168.1.109",
+    mac: "00:22:33:44:55:66",
+    status: "online",
     cpu: 23,
     memory: 45,
     disk: 45,
     battery: 95,
     signal: 87,
-    temperature: 38
+    temperature: 38,
   },
   {
-    id: '10',
-    name: 'DEVICE_SW_CORE',
-    type: '核心交换机',
-    version: 'v6.1.2',
-    ip: '192.168.1.110',
-    mac: '00:23:34:45:56:67',
-    status: 'online',
+    id: "10",
+    name: "DEVICE_SW_CORE",
+    type: "核心交换机",
+    version: "v6.1.2",
+    ip: "192.168.1.110",
+    mac: "00:23:34:45:56:67",
+    status: "online",
     cpu: 42,
     memory: 38,
     disk: 38,
     battery: 12,
     signal: 95,
-    temperature: 48
+    temperature: 48,
   },
   {
-    id: '11',
-    name: 'DEVICE_ROUTER_MAIN',
-    type: '主路由器',
-    version: 'v5.0.3',
-    ip: '192.168.1.111',
-    mac: '00:24:35:46:57:68',
-    status: 'online',
+    id: "11",
+    name: "DEVICE_ROUTER_MAIN",
+    type: "主路由器",
+    version: "v5.0.3",
+    ip: "192.168.1.111",
+    mac: "00:24:35:46:57:68",
+    status: "online",
     cpu: 56,
     memory: 41,
     disk: 41,
     battery: 8,
     signal: 98,
-    temperature: 52
-  }
-])
+    temperature: 52,
+  },
+]);
 
 // 搜索、筛选、分页相关
-const searchQuery = ref('')
-const filterStatus = ref('all')
-const currentPage = ref(1)
-const pageSize = ref(6)
+const searchQuery = ref("");
+const filterStatus = ref("all");
+const currentPage = ref(1);
+const pageSize = ref(6);
 
 // 弹窗相关
-const selectedDevice = ref<Device | null>(null)
+const selectedDevice = ref<Device | null>(null);
 
 // 过滤设备
 const filteredDevices = computed(() => {
-  return devices.value.filter(device => {
+  return devices.value.filter((device) => {
     const matchesSearch =
       device.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
       device.type.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      device.ip.includes(searchQuery.value)
+      device.ip.includes(searchQuery.value);
 
     const matchesStatus =
-      filterStatus.value === 'all' || device.status === filterStatus.value
+      filterStatus.value === "all" || device.status === filterStatus.value;
 
-    return matchesSearch && matchesStatus
-  })
-})
+    return matchesSearch && matchesStatus;
+  });
+});
 
 // 分页计算
-const totalPages = computed(() => Math.ceil(filteredDevices.value.length / pageSize.value))
-const startIndex = computed(() => (currentPage.value - 1) * pageSize.value)
-const endIndex = computed(() => Math.min(startIndex.value + pageSize.value, filteredDevices.value.length))
+const totalPages = computed(() =>
+  Math.ceil(filteredDevices.value.length / pageSize.value)
+);
+const startIndex = computed(() => (currentPage.value - 1) * pageSize.value);
+const endIndex = computed(() =>
+  Math.min(startIndex.value + pageSize.value, filteredDevices.value.length)
+);
 const paginatedDevices = computed(() => {
-  return filteredDevices.value.slice(startIndex.value, endIndex.value)
-})
+  return filteredDevices.value.slice(startIndex.value, endIndex.value);
+});
 
 // 分页控制
 const nextPage = () => {
-  if (currentPage.value < totalPages.value) currentPage.value++
-}
+  if (currentPage.value < totalPages.value) currentPage.value++;
+};
 const prevPage = () => {
-  if (currentPage.value > 1) currentPage.value--
-}
+  if (currentPage.value > 1) currentPage.value--;
+};
 const resetPagination = () => {
-  currentPage.value = 1
-}
+  currentPage.value = 1;
+};
 
 // 弹窗：显示设备详情
 const showDetails = (device: Device) => {
-  selectedDevice.value = device
-}
+  selectedDevice.value = device;
+};
 
 const closeModal = () => {
-  selectedDevice.value = null
-}
+  selectedDevice.value = null;
+};
 
 // 将设备对象转换为 { label: value } 形式，用于展示
 const displayDeviceData = computed(() => {
-  if (!selectedDevice.value) return {}
-  const d = selectedDevice.value
+  if (!selectedDevice.value) return {};
+  const d = selectedDevice.value;
   return {
     名称: d.name,
     类型: d.type,
     版本: d.version,
     IP地址: d.ip,
     MAC地址: d.mac,
-    状态: d.status === 'online' ? '在线' : '离线',
+    状态: d.status === "online" ? "在线" : "离线",
     CPU使用率: `${d.cpu}%`,
     内存使用率: `${d.memory}%`,
     磁盘使用率: `${d.disk}%`,
     电池电量: `${d.battery}%`,
     信号强度: `${d.signal}%`,
-    温度: `${d.temperature}°C`
-  }
-})
+    温度: `${d.temperature}°C`,
+  };
+});
 
 // 输入框的 label 显示中文
 const getLabelText = (key: string) => {
   const labels: Record<string, string> = {
-    名称: '名称',
-    类型: '类型',
-    版本: '版本',
-    IP地址: 'IP 地址',
-    MAC地址: 'MAC 地址',
-    状态: '状态',
-    CPU使用率: 'CPU 使用率',
-    内存使用率: '内存 使用率',
-    磁盘使用率: '磁盘 使用率',
-    电池电量: '电池 电量',
-    信号强度: '信号 强度',
-    温度: '温度'
-  }
-  return labels[key] || key
-}
+    名称: "名称",
+    类型: "类型",
+    版本: "版本",
+    IP地址: "IP 地址",
+    MAC地址: "MAC 地址",
+    状态: "状态",
+    CPU使用率: "CPU 使用率",
+    内存使用率: "内存 使用率",
+    磁盘使用率: "磁盘 使用率",
+    电池电量: "电池 电量",
+    信号强度: "信号 强度",
+    温度: "温度",
+  };
+  return labels[key] || key;
+};
 
 // 模拟API获取 & 数据自动更新
 const fetchDevices = () => {
   // console.log('获取设备数据...')
-}
+};
 
 onMounted(() => {
-  fetchDevices()
+  fetchDevices();
   setInterval(() => {
-    devices.value.forEach(device => {
-      if (device.status === 'online') {
-        device.cpu = Math.floor(Math.random() * 101)
-        device.memory = Math.floor(Math.random() * 101)
-        device.battery = Math.floor(Math.random() * 101)
-        device.signal = Math.floor(Math.random() * 101)
-        device.temperature = Math.floor(Math.random() * 101)
+    devices.value.forEach((device) => {
+      if (device.status === "online") {
+        device.cpu = Math.floor(Math.random() * 101);
+        device.memory = Math.floor(Math.random() * 101);
+        device.battery = Math.floor(Math.random() * 101);
+        device.signal = Math.floor(Math.random() * 101);
+        device.temperature = Math.floor(Math.random() * 101);
       }
-    })
-  }, 5000)
-})
+    });
+  }, 5000);
+});
 </script>
 
 <style scoped>

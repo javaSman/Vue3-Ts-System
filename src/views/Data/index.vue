@@ -22,7 +22,7 @@
             <span class="icon">↺</span> 重置
           </button>
           <button class="btn btn-sm" @click="toggleQuerySection">
-            {{ showQuerySection ? '收起' : '展开' }}
+            {{ showQuerySection ? "收起" : "展开" }}
           </button>
         </div>
       </div>
@@ -31,7 +31,11 @@
         <div class="form-row">
           <div class="form-group">
             <label>字段名称</label>
-            <input type="text" v-model="queryParams.fieldName" placeholder="输入字段名称" />
+            <input
+              type="text"
+              v-model="queryParams.fieldName"
+              placeholder="输入字段名称"
+            />
           </div>
           <div class="form-group">
             <label>字段类型</label>
@@ -46,9 +50,17 @@
           <div class="form-group">
             <label>创建时间</label>
             <div class="date-range">
-              <input type="date" v-model="queryParams.createTimeStart" placeholder="开始时间" />
+              <input
+                type="date"
+                v-model="queryParams.createTimeStart"
+                placeholder="开始时间"
+              />
               <span class="separator">至</span>
-              <input type="date" v-model="queryParams.createTimeEnd" placeholder="结束时间" />
+              <input
+                type="date"
+                v-model="queryParams.createTimeEnd"
+                placeholder="结束时间"
+              />
             </div>
           </div>
         </div>
@@ -64,7 +76,11 @@
           </div>
           <div class="form-group">
             <label>关键字搜索</label>
-            <input type="text" v-model="queryParams.keyword" placeholder="输入关键字搜索" />
+            <input
+              type="text"
+              v-model="queryParams.keyword"
+              placeholder="输入关键字搜索"
+            />
           </div>
           <div class="form-group">
             <label>&nbsp;</label>
@@ -86,7 +102,10 @@
         <div class="table-actions">
           <div class="page-size-selector">
             <span>每页显示：</span>
-            <select v-model="pagination.pageSize" @change="handlePageSizeChange">
+            <select
+              v-model="pagination.pageSize"
+              @change="handlePageSizeChange"
+            >
               <option value="10">10</option>
               <option value="20">20</option>
               <option value="50">50</option>
@@ -103,7 +122,11 @@
               <th v-for="column in tableColumns" :key="column.key">
                 <div class="th-content">
                   {{ column.title }}
-                  <span v-if="column.sortable" class="sort-icon" @click="handleSort(column.key)">
+                  <span
+                    v-if="column.sortable"
+                    class="sort-icon"
+                    @click="handleSort(column.key)"
+                  >
                     {{ getSortIcon(column.key) }}
                   </span>
                 </div>
@@ -124,7 +147,11 @@
                   <button class="btn-icon" title="编辑" @click="editItem(item)">
                     ✏️
                   </button>
-                  <button class="btn-icon" title="删除" @click="deleteItem(item)">
+                  <button
+                    class="btn-icon"
+                    title="删除"
+                    @click="deleteItem(item)"
+                  >
                     🗑️
                   </button>
                 </td>
@@ -134,7 +161,9 @@
                   <div class="empty-state">
                     <div class="empty-icon">📊</div>
                     <p>暂无数据</p>
-                    <button class="btn btn-primary" @click="resetQuery">重置查询条件</button>
+                    <button class="btn btn-primary" @click="resetQuery">
+                      重置查询条件
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -152,24 +181,40 @@
 
       <!-- 分页控件 -->
       <div v-if="tableData.length > 0" class="pagination">
-        <button class="pagination-btn" :disabled="pagination.currentPage === 1"
-          @click="goToPage(pagination.currentPage - 1)">
+        <button
+          class="pagination-btn"
+          :disabled="pagination.currentPage === 1"
+          @click="goToPage(pagination.currentPage - 1)"
+        >
           上一页
         </button>
 
-        <span v-for="page in pagination.pages" :key="page" class="page-number"
-          :class="{ active: page === pagination.currentPage }" @click="goToPage(page)">
+        <span
+          v-for="page in pagination.pages"
+          :key="page"
+          class="page-number"
+          :class="{ active: page === pagination.currentPage }"
+          @click="goToPage(page)"
+        >
           {{ page }}
         </span>
 
-        <button class="pagination-btn" :disabled="pagination.currentPage === pagination.totalPages"
-          @click="goToPage(pagination.currentPage + 1)">
+        <button
+          class="pagination-btn"
+          :disabled="pagination.currentPage === pagination.totalPages"
+          @click="goToPage(pagination.currentPage + 1)"
+        >
           下一页
         </button>
 
         <div class="page-jump">
           <span>跳至</span>
-          <input type="number" v-model="pageJumpInput" min="1" :max="pagination.totalPages" />
+          <input
+            type="number"
+            v-model="pageJumpInput"
+            min="1"
+            :max="pagination.totalPages"
+          />
           <span>页</span>
           <button class="btn btn-sm" @click="jumpToPage">确定</button>
         </div>
@@ -184,7 +229,11 @@
           <button class="modal-close" @click="closeViewModal">×</button>
         </div>
         <div class="modal-body">
-          <div class="detail-row" v-for="column in tableColumns" :key="column.key">
+          <div
+            class="detail-row"
+            v-for="column in tableColumns"
+            :key="column.key"
+          >
             <label>{{ column.title }}：</label>
             <span>{{ selectedItem[column.key as keyof TableItem] }}</span>
           </div>
@@ -251,7 +300,9 @@
         </div>
         <div class="modal-footer">
           <button class="btn" @click="closeDeleteModal">取消</button>
-          <button class="btn btn-danger" @click="confirmDelete">确定删除</button>
+          <button class="btn btn-danger" @click="confirmDelete">
+            确定删除
+          </button>
         </div>
       </div>
     </div>
@@ -259,89 +310,98 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import { fetchDataCenter } from '@/api/dataCenter'
-import { Document, Paragraph, TextRun, Table, TableRow, TableCell, Packer, HeadingLevel } from 'docx'
-import { saveAs } from 'file-saver'
-import { request } from 'http'
+import { ref, reactive, onMounted } from "vue";
+import { fetchDataCenter } from "@/api/dataCenter";
+import {
+  Document,
+  Paragraph,
+  TextRun,
+  Table,
+  TableRow,
+  TableCell,
+  Packer,
+  HeadingLevel,
+} from "docx";
+import { saveAs } from "file-saver";
+import { request } from "http";
 
 // 类型定义
 interface QueryParams {
-  fieldName: string
-  fieldType: string
-  createTimeStart: string
-  createTimeEnd: string
-  status: string
-  keyword: string
+  fieldName: string;
+  fieldType: string;
+  createTimeStart: string;
+  createTimeEnd: string;
+  status: string;
+  keyword: string;
 }
 
 // 定义 TableItem 类型
 interface TableItem {
-  id: number
-  name: string
-  type: string
-  description: string
-  createTime: string
-  status: string
-  value: string
+  id: number;
+  name: string;
+  type: string;
+  description: string;
+  createTime: string;
+  status: string;
+  value: string;
 }
 
 // 确保 TableColumn 的 key 只能是 TableItem 的键
 interface TableColumn {
-  key: keyof TableItem
-  title: string
-  sortable?: boolean
+  key: keyof TableItem;
+  title: string;
+  sortable?: boolean;
 }
 
 interface Pagination {
-  currentPage: number
-  pageSize: number
-  total: number
-  totalPages: number
-  pages: number[]
+  currentPage: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+  pages: number[];
 }
 
 interface EditForm {
-  id: number
-  name: string
-  type: string
-  description: string
-  status: string
-  value: string
+  id: number;
+  name: string;
+  type: string;
+  description: string;
+  status: string;
+  value: string;
 }
 
 // 响应式数据
-const showQuerySection = ref(true)
-const loading = ref(false)
-const tableData = ref<TableItem[]>([])
-const sortField = ref<keyof TableItem>('id')
-const sortDirection = ref<'asc' | 'desc'>('asc')
-const pageJumpInput = ref<number | null>(null)
-const showViewModal = ref(false)
-const showEditModal = ref(false)
-const showDeleteModal = ref(false)
-const selectedItem = ref<TableItem>({} as TableItem)
-const deleteItemToConfirm = ref<TableItem | null>(null)
+const showQuerySection = ref(true);
+const loading = ref(false);
+const tableData = ref<TableItem[]>([]);
+const sortField = ref<keyof TableItem>("id");
+const sortDirection = ref<"asc" | "desc">("asc");
+const pageJumpInput = ref<number | null>(null);
+const showViewModal = ref(false);
+const showEditModal = ref(false);
+const showDeleteModal = ref(false);
+const selectedItem = ref<TableItem>({} as TableItem);
+const deleteItemToConfirm = ref<TableItem | null>(null);
 
 // 查询参数
 const queryParams = reactive<QueryParams>({
-  fieldName: '',
-  fieldType: '',
-  createTimeStart: '',
-  createTimeEnd: '',
-  status: '',
-  keyword: ''
-})
+  fieldName: "",
+  fieldType: "",
+  createTimeStart: "",
+  createTimeEnd: "",
+  status: "",
+  keyword: "",
+});
 
 // 编辑表单
 const editForm = reactive<EditForm>({
   id: 0,
-  name: '',
-  type: 'string',
-  description: '',
-  status: 'active',
-  value: ''
-})
+  name: "",
+  type: "string",
+  description: "",
+  status: "active",
+  value: "",
+});
 
 // 分页信息
 const pagination = reactive<Pagination>({
@@ -349,89 +409,95 @@ const pagination = reactive<Pagination>({
   pageSize: 10,
   total: 0,
   totalPages: 0,
-  pages: []
-})
+  pages: [],
+});
 
 // 表格列定义 - 确保所有 key 都是 TableItem 的有效属性
 const tableColumns: TableColumn[] = [
-  { key: 'id', title: 'ID', sortable: true },
-  { key: 'name', title: '字段名称', sortable: true },
-  { key: 'type', title: '字段类型' },
-  { key: 'description', title: '描述' },
-  { key: 'createTime', title: '创建时间', sortable: true },
-  { key: 'status', title: '状态' },
-  { key: 'value', title: '字段值' }
-]
+  { key: "id", title: "ID", sortable: true },
+  { key: "name", title: "字段名称", sortable: true },
+  { key: "type", title: "字段类型" },
+  { key: "description", title: "描述" },
+  { key: "createTime", title: "创建时间", sortable: true },
+  { key: "status", title: "状态" },
+  { key: "value", title: "字段值" },
+];
 
 // 方法
 const toggleQuerySection = () => {
-  showQuerySection.value = !showQuerySection.value
-  sessionStorage.setItem('showQuerySection', JSON.stringify(showQuerySection.value))
-}
+  showQuerySection.value = !showQuerySection.value;
+  sessionStorage.setItem(
+    "showQuerySection",
+    JSON.stringify(showQuerySection.value)
+  );
+};
 
 const resetQuery = () => {
   Object.assign(queryParams, {
-    fieldName: '',
-    fieldType: '',
-    createTimeStart: '',
-    createTimeEnd: '',
-    status: '',
-    keyword: ''
-  })
+    fieldName: "",
+    fieldType: "",
+    createTimeStart: "",
+    createTimeEnd: "",
+    status: "",
+    keyword: "",
+  });
   // 重置排序
-  sortField.value = 'id'
-  sortDirection.value = 'asc'
-  handleQuery()
-}
+  sortField.value = "id";
+  sortDirection.value = "asc";
+  handleQuery();
+};
 
 const handleQuery = () => {
-  pagination.currentPage = 1
-  fetchData()
-}
+  pagination.currentPage = 1;
+  fetchData();
+};
 
 const handleSort = (field: keyof TableItem) => {
   if (sortField.value === field) {
-    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
+    sortDirection.value = sortDirection.value === "asc" ? "desc" : "asc";
   } else {
-    sortField.value = field
-    sortDirection.value = 'asc'
+    sortField.value = field;
+    sortDirection.value = "asc";
   }
   // 排序后重新获取数据
-  pagination.currentPage = 1
-  fetchData()
-}
+  pagination.currentPage = 1;
+  fetchData();
+};
 
 const getSortIcon = (field: keyof TableItem) => {
-  if (sortField.value !== field) return '↕️'
-  return sortDirection.value === 'asc' ? '↑' : '↓'
-}
+  if (sortField.value !== field) return "↕️";
+  return sortDirection.value === "asc" ? "↑" : "↓";
+};
 
 const refreshData = () => {
-  fetchData()
-}
+  fetchData();
+};
 
 const exportData = async () => {
   try {
-    loading.value = true
+    loading.value = true;
 
     // 获取所有数据（不分页）
-    const requestParams: any = {}
-    Object.keys(queryParams).forEach(key => {
-      const value = queryParams[key as keyof QueryParams]
-      if (value !== '' && value !== null && value !== undefined) {
-        requestParams[key] = value
+    const requestParams: any = {};
+    Object.keys(queryParams).forEach((key) => {
+      const value = queryParams[key as keyof QueryParams];
+      if (value !== "" && value !== null && value !== undefined) {
+        requestParams[key] = value;
       }
-    })
+    });
 
     // 添加排序参数到导出请求
-    requestParams.sortField = sortField.value
-    requestParams.sortOrder = sortDirection.value
+    requestParams.sortField = sortField.value;
+    requestParams.sortOrder = sortDirection.value;
 
-    const result = await fetchDataCenter({ ...requestParams, pageSize: pagination.total })
+    const result = await fetchDataCenter({
+      ...requestParams,
+      pageSize: pagination.total,
+    });
 
-    if (!result.success) throw new Error(result.message || '获取导出数据失败')
+    if (!result.success) throw new Error(result.message || "获取导出数据失败");
 
-    const allData = result.data
+    const allData = result.data;
 
     // 创建Word文档
     const doc = new Document({
@@ -441,51 +507,51 @@ const exportData = async () => {
             new Paragraph({
               text: "数据后台管理系统导出数据",
               heading: HeadingLevel.HEADING_1,
-              spacing: { after: 200 }
+              spacing: { after: 200 },
             }),
             new Paragraph({
               text: `导出时间: ${new Date().toLocaleString()}`,
-              spacing: { after: 400 }
+              spacing: { after: 400 },
             }),
             createDataTable(allData),
             new Paragraph({
               text: `共导出 ${allData.length} 条记录`,
-              spacing: { before: 400 }
-            })
-          ]
-        }
-      ]
-    })
+              spacing: { before: 400 },
+            }),
+          ],
+        },
+      ],
+    });
 
     // 生成Word文档并下载
-    Packer.toBlob(doc).then(blob => {
-      saveAs(blob, `数据导出_${new Date().toISOString().slice(0, 10)}.docx`)
-    })
-
+    Packer.toBlob(doc).then((blob) => {
+      saveAs(blob, `数据导出_${new Date().toISOString().slice(0, 10)}.docx`);
+    });
   } catch (error) {
-    console.error('导出数据失败:', error)
-    alert('导出数据失败，请稍后再试')
+    console.error("导出数据失败:", error);
+    alert("导出数据失败，请稍后再试");
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 const createDataTable = (data: TableItem[]) => {
   // 表头行
-  const headerCells = tableColumns.map(column =>
-    new TableCell({
-      children: [
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: column.title,
-              bold: true
-            })
-          ]
-        })
-      ]
-    })
-  )
+  const headerCells = tableColumns.map(
+    (column) =>
+      new TableCell({
+        children: [
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: column.title,
+                bold: true,
+              }),
+            ],
+          }),
+        ],
+      })
+  );
 
   // 添加操作列标题
   headerCells.push(
@@ -494,34 +560,35 @@ const createDataTable = (data: TableItem[]) => {
         new Paragraph({
           children: [
             new TextRun({
-              text: '操作',
-              bold: true
-            })
-          ]
-        })
-      ]
+              text: "操作",
+              bold: true,
+            }),
+          ],
+        }),
+      ],
     })
-  )
+  );
 
   const headerRow = new TableRow({
-    children: headerCells
-  })
+    children: headerCells,
+  });
 
   // 数据行
-  const dataRows = data.map(item => {
-    const cells = tableColumns.map(column =>
-      new TableCell({
-        children: [
-          new Paragraph({
-            children: [
-              new TextRun({
-                text: String(item[column.key])
-              })
-            ]
-          })
-        ]
-      })
-    )
+  const dataRows = data.map((item) => {
+    const cells = tableColumns.map(
+      (column) =>
+        new TableCell({
+          children: [
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: String(item[column.key]),
+                }),
+              ],
+            }),
+          ],
+        })
+    );
 
     // 添加操作列
     cells.push(
@@ -530,27 +597,27 @@ const createDataTable = (data: TableItem[]) => {
           new Paragraph({
             children: [
               new TextRun({
-                text: '查看/编辑/删除'
-              })
-            ]
-          })
-        ]
+                text: "查看/编辑/删除",
+              }),
+            ],
+          }),
+        ],
       })
-    )
+    );
 
     return new TableRow({
-      children: cells
-    })
-  })
+      children: cells,
+    });
+  });
 
   return new Table({
     rows: [headerRow, ...dataRows],
     width: {
       size: 100,
-      type: 'pct'
-    }
-  })
-}
+      type: "pct",
+    },
+  });
+};
 
 const fetchData = async () => {
   loading.value = true;
@@ -561,13 +628,13 @@ const fetchData = async () => {
       pageSize: Number(pagination.pageSize),
       sortField: sortField.value,
       sortOrder: sortDirection.value,
-      value: 50
+      value: 50,
     };
 
     // 只添加有值的查询参数
     Object.keys(queryParams).forEach((key) => {
       const value = queryParams[key as keyof QueryParams];
-      if (value !== '' && value !== null && value !== undefined) {
+      if (value !== "" && value !== null && value !== undefined) {
         requestParams[key] = value;
       }
     });
@@ -577,7 +644,7 @@ const fetchData = async () => {
 
     if (editForm.id) {
       updateDataObj.id = editForm.id; // ✅ 必须有 id，用于定位要更新的记录
-      updateDataObj.name = editForm.name || undefined;         // ✅ 要更新的字段（根据你的实际表单字段调整）
+      updateDataObj.name = editForm.name || undefined; // ✅ 要更新的字段（根据你的实际表单字段调整）
       updateDataObj.status = editForm.status || undefined;
       updateDataObj.description = editForm.description || undefined;
       updateDataObj.type = editForm.type || undefined;
@@ -592,7 +659,7 @@ const fetchData = async () => {
     const result = await fetchDataCenter(requestParams);
 
     if (!result.success) {
-      throw new Error(result.message || '获取数据失败');
+      throw new Error(result.message || "获取数据失败");
     }
 
     // ✅ 更新前端表格数据以及分页信息
@@ -602,8 +669,14 @@ const fetchData = async () => {
 
     // 生成页码数组（UI 分页控件用）
     const maxVisiblePages = 10;
-    let startPage = Math.max(1, pagination.currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(pagination.totalPages, startPage + maxVisiblePages - 1);
+    let startPage = Math.max(
+      1,
+      pagination.currentPage - Math.floor(maxVisiblePages / 2)
+    );
+    let endPage = Math.min(
+      pagination.totalPages,
+      startPage + maxVisiblePages - 1
+    );
 
     if (endPage - startPage + 1 < maxVisiblePages) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
@@ -613,9 +686,8 @@ const fetchData = async () => {
       { length: endPage - startPage + 1 },
       (_, i) => startPage + i
     );
-
   } catch (error) {
-    console.error('获取数据失败:', error);
+    console.error("获取数据失败:", error);
     // 可以在这里加一个用户提示，比如使用 ElMessage 或 Toast
   } finally {
     loading.value = false;
@@ -623,26 +695,26 @@ const fetchData = async () => {
 };
 
 const handlePageSizeChange = () => {
-  pagination.currentPage = 1
-  fetchData()
-}
+  pagination.currentPage = 1;
+  fetchData();
+};
 
 const goToPage = (page: number) => {
-  if (page < 1 || page > pagination.totalPages) return
-  pagination.currentPage = page
-  fetchData()
-}
+  if (page < 1 || page > pagination.totalPages) return;
+  pagination.currentPage = page;
+  fetchData();
+};
 
 const jumpToPage = () => {
-  if (!pageJumpInput.value) return
-  goToPage(pageJumpInput.value)
-  pageJumpInput.value = null
-}
+  if (!pageJumpInput.value) return;
+  goToPage(pageJumpInput.value);
+  pageJumpInput.value = null;
+};
 
 const viewItem = (item: TableItem) => {
-  selectedItem.value = { ...item }
-  showViewModal.value = true
-}
+  selectedItem.value = { ...item };
+  showViewModal.value = true;
+};
 
 const editItem = (item: TableItem) => {
   Object.assign(editForm, {
@@ -651,55 +723,57 @@ const editItem = (item: TableItem) => {
     type: item.type,
     description: item.description,
     status: item.status,
-    value: item.value
-  })
-  showEditModal.value = true
-}
+    value: item.value,
+  });
+  showEditModal.value = true;
+};
 
 const deleteItem = (item: TableItem) => {
-  deleteItemToConfirm.value = item
-  showDeleteModal.value = true
-}
+  deleteItemToConfirm.value = item;
+  showDeleteModal.value = true;
+};
 
 const confirmDelete = () => {
   if (deleteItemToConfirm.value) {
     // 这里应该是实际的删除API调用
-    console.log(`已删除: ${deleteItemToConfirm.value.name}`)
-    showDeleteModal.value = false
-    deleteItemToConfirm.value = null
-    fetchData() // 刷新数据
+    console.log(`已删除: ${deleteItemToConfirm.value.name}`);
+    showDeleteModal.value = false;
+    deleteItemToConfirm.value = null;
+    fetchData(); // 刷新数据
   }
-}
+};
 
 const closeDeleteModal = () => {
-  showDeleteModal.value = false
-  deleteItemToConfirm.value = null
-}
+  showDeleteModal.value = false;
+  deleteItemToConfirm.value = null;
+};
 
 const closeViewModal = () => {
-  showViewModal.value = false
-}
+  showViewModal.value = false;
+};
 
 const closeEditModal = () => {
-  showEditModal.value = false
-}
+  showEditModal.value = false;
+};
 
 const saveEdit = () => {
   // alert(`保存成功: ${editForm.name}`)
-  fetchData() // 刷新数据
-  showEditModal.value = false
-  editForm.id = 0
-}
+  fetchData(); // 刷新数据
+  showEditModal.value = false;
+  editForm.id = 0;
+};
 
 onMounted(() => {
-  fetchData()
-  showQuerySection.value = JSON.parse(sessionStorage.getItem('showQuerySection') || 'true')
-})
+  fetchData();
+  showQuerySection.value = JSON.parse(
+    sessionStorage.getItem("showQuerySection") || "true"
+  );
+});
 </script>
 <style scoped>
 .data-management-container {
   padding: 20px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: #333;
   background-color: #f5f7fa;
   min-height: 100vh;

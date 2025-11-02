@@ -51,7 +51,11 @@
       <div class="recent-activity">
         <h2>最近活动</h2>
         <div class="activity-list">
-          <div v-for="(activity, index) in activities" :key="index" class="activity-item">
+          <div
+            v-for="(activity, index) in activities"
+            :key="index"
+            class="activity-item"
+          >
             <span class="activity-time">{{ activity.time }}</span>
             <span class="activity-content">{{ activity.content }}</span>
           </div>
@@ -65,40 +69,42 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
-import { useRoute } from 'vue-router';
-import { useAuthStore } from '@/stores/auth';
-import { fetchRecentActivities } from '@/api/activity';
+import { computed, onMounted, ref } from "vue";
+import { useRoute } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
+import { fetchRecentActivities } from "@/api/activity";
 
 const authStore = useAuthStore();
 const userInfo = computed(() => authStore.userInfo);
 const route = useRoute();
-const isChild = computed(() => { return route.matched.length > 1; });
-const activities = ref<Array<{ id?: number; time: string; content: string }>>([]);
+const isChild = computed(() => {
+  return route.matched.length > 1;
+});
+const activities = ref<Array<{ id?: number; time: string; content: string }>>(
+  []
+);
 
 onMounted(async () => {
   try {
     const params = { value: 35 }; // 传递正确的对象格式
     const res = await fetchRecentActivities(params);
-    console.log('获取到的最近活动数据:', res);
+    console.log("获取到的最近活动数据:", res);
 
     if (Array.isArray(res)) {
       activities.value = res as Array<{ time: string; content: string }>;
-    } else if (res && typeof res === 'object') {
+    } else if (res && typeof res === "object") {
       if (res.success && Array.isArray(res.data)) {
         activities.value = res.data as Array<{ time: string; content: string }>;
       }
     }
 
     if (!activities.value || activities.value.length === 0) {
-      activities.value = [
-        { time: '刚刚', content: '暂无活动，稍后再试~' }
-      ];
+      activities.value = [{ time: "刚刚", content: "暂无活动，稍后再试~" }];
     }
   } catch (error) {
-    console.error('获取最近活动数据失败:', error);
+    console.error("获取最近活动数据失败:", error);
   }
-})
+});
 </script>
 
 <style scoped>

@@ -24,7 +24,11 @@
       <div class="search-container">
         <div class="search-box">
           <i class="icon-search"></i>
-          <input v-model="searchKeyword" type="text" placeholder="搜索用户名或邮箱..." />
+          <input
+            v-model="searchKeyword"
+            type="text"
+            placeholder="搜索用户名或邮箱..."
+          />
         </div>
         <div class="filter-section">
           <select v-model="roleFilter" class="filter-select">
@@ -97,43 +101,86 @@
               <td colspan="7" class="empty-state">
                 <div class="empty-content">
                   <i class="icon-empty"></i>
-                  <h3>{{ searchKeyword || roleFilter || statusFilter ? '没有找到匹配的用户' : '暂无用户数据' }}</h3>
-                  <p>{{ searchKeyword || roleFilter || statusFilter ? '请尝试修改搜索条件' : '点击上方按钮添加第一个用户' }}</p>
+                  <h3>
+                    {{
+                      searchKeyword || roleFilter || statusFilter
+                        ? "没有找到匹配的用户"
+                        : "暂无用户数据"
+                    }}
+                  </h3>
+                  <p>
+                    {{
+                      searchKeyword || roleFilter || statusFilter
+                        ? "请尝试修改搜索条件"
+                        : "点击上方按钮添加第一个用户"
+                    }}
+                  </p>
                 </div>
               </td>
             </tr>
-            <tr v-else v-for="user in paginatedUsers" :key="user.id" class="user-row">
+            <tr
+              v-else
+              v-for="user in paginatedUsers"
+              :key="user.id"
+              class="user-row"
+            >
               <td class="id-cell">{{ user.id }}</td>
               <td class="username-cell">
                 <div class="user-info">
-                  <div class="user-avatar">{{ user.username.charAt(0).toUpperCase() }}</div>
+                  <div class="user-avatar">
+                    {{ user.username.charAt(0).toUpperCase() }}
+                  </div>
                   <span class="username">{{ user.username }}</span>
                 </div>
               </td>
               <td class="email-cell">{{ user.email }}</td>
               <td class="role-cell">
                 <span :class="['role-badge', `role-${user.role}`]">
-                  <i :class="user.role === 'admin' ? 'icon-shield' : 'icon-user'"></i>
-                  {{ user.role === 'guest' ? '超级管理员' : user.role === 'admin' ? '管理员' : '用户' }}
+                  <i
+                    :class="user.role === 'admin' ? 'icon-shield' : 'icon-user'"
+                  ></i>
+                  {{
+                    user.role === "guest"
+                      ? "超级管理员"
+                      : user.role === "admin"
+                      ? "管理员"
+                      : "用户"
+                  }}
                 </span>
               </td>
               <td class="status-cell">
                 <span :class="['status-badge', `status-${user.status}`]">
-                  <i :class="user.status === 'active' ? 'icon-check' : 'icon-pause'"></i>
-                  {{ user.status === 'active' ? '活跃' : '非活跃' }}
+                  <i
+                    :class="
+                      user.status === 'active' ? 'icon-check' : 'icon-pause'
+                    "
+                  ></i>
+                  {{ user.status === "active" ? "活跃" : "非活跃" }}
                 </span>
               </td>
               <td class="date-cell">{{ formatDate(user.registeredAt) }}</td>
               <td class="actions-cell">
                 <div class="action-buttons">
-                  <button class="btn-action btn-view" @click="viewUserPermissions(user)" :title="'查看权限'">
+                  <button
+                    class="btn-action btn-view"
+                    @click="viewUserPermissions(user)"
+                    :title="'查看权限'"
+                  >
                     <i class="icon-eye"></i>
                   </button>
-                  <button class="btn-action btn-edit" @click="editUser(user)" :title="'编辑用户'">
+                  <button
+                    class="btn-action btn-edit"
+                    @click="editUser(user)"
+                    :title="'编辑用户'"
+                  >
                     <i class="icon-edit"></i>
                   </button>
-                  <button class="btn-action btn-delete" @click="confirmDelete(user)" :disabled="deleteLoading"
-                    :title="'删除用户'">
+                  <button
+                    class="btn-action btn-delete"
+                    @click="confirmDelete(user)"
+                    :disabled="deleteLoading"
+                    :title="'删除用户'"
+                  >
                     <i class="icon-delete"></i>
                   </button>
                 </div>
@@ -145,19 +192,36 @@
 
       <!-- 分页 -->
       <div v-if="totalPages > 1" class="pagination">
-        <button class="pagination-btn" @click="currentPage = 1" :disabled="currentPage === 1">
+        <button
+          class="pagination-btn"
+          @click="currentPage = 1"
+          :disabled="currentPage === 1"
+        >
           首页
         </button>
-        <button class="pagination-btn" @click="currentPage--" :disabled="currentPage === 1">
+        <button
+          class="pagination-btn"
+          @click="currentPage--"
+          :disabled="currentPage === 1"
+        >
           上一页
         </button>
         <span class="pagination-info">
-          {{ currentPage }} / {{ totalPages }} 页 (共 {{ filteredUsers.length }} 条记录)
+          {{ currentPage }} / {{ totalPages }} 页 (共
+          {{ filteredUsers.length }} 条记录)
         </span>
-        <button class="pagination-btn" @click="currentPage++" :disabled="currentPage === totalPages">
+        <button
+          class="pagination-btn"
+          @click="currentPage++"
+          :disabled="currentPage === totalPages"
+        >
           下一页
         </button>
-        <button class="pagination-btn" @click="currentPage = totalPages" :disabled="currentPage === totalPages">
+        <button
+          class="pagination-btn"
+          @click="currentPage = totalPages"
+          :disabled="currentPage === totalPages"
+        >
           末页
         </button>
       </div>
@@ -176,15 +240,33 @@
           <div class="form-row">
             <div class="form-group">
               <label class="form-label">用户名 *</label>
-              <input v-model="newUser.username" type="text" class="form-input" placeholder="请输入用户名" required />
+              <input
+                v-model="newUser.username"
+                type="text"
+                class="form-input"
+                placeholder="请输入用户名"
+                required
+              />
             </div>
             <div class="form-group">
               <label class="form-label">邮箱 *</label>
-              <input v-model="newUser.email" type="email" class="form-input" placeholder="请输入邮箱地址" required />
+              <input
+                v-model="newUser.email"
+                type="email"
+                class="form-input"
+                placeholder="请输入邮箱地址"
+                required
+              />
             </div>
             <div class="form-group">
               <label class="form-label">密码 *</label>
-              <input v-model="newUser.password" type="password" class="form-input" placeholder="请输入密码" required />
+              <input
+                v-model="newUser.password"
+                type="password"
+                class="form-input"
+                placeholder="请输入密码"
+                required
+              />
             </div>
           </div>
           <!-- 权限选择区域（仅超级管理员可见） -->
@@ -193,23 +275,38 @@
               <label class="form-label">
                 页面权限
                 <span class="form-hint">(选择用户可以访问的页面)</span>
-                <span v-if="permissionsLoading" class="loading-text">加载中...</span>
+                <span v-if="permissionsLoading" class="loading-text"
+                  >加载中...</span
+                >
               </label>
               <div class="permissions-container">
                 <div v-if="permissionsLoading" class="permissions-loading">
                   <div class="mini-spinner"></div>
                   <span>正在加载可用权限...</span>
                 </div>
-                <div v-else-if="availablePermissions.length === 0" class="permissions-empty">
+                <div
+                  v-else-if="availablePermissions.length === 0"
+                  class="permissions-empty"
+                >
                   <i class="icon-warning"></i>
                   <span>无可用权限</span>
                 </div>
                 <div v-else class="permissions-checkboxes">
-                  <label v-for="permission in availablePermissions" :key="permission.name" class="permission-checkbox">
-                    <input type="checkbox" :value="permission.name" v-model="newUser.routePermissions" />
+                  <label
+                    v-for="permission in availablePermissions"
+                    :key="permission.name"
+                    class="permission-checkbox"
+                  >
+                    <input
+                      type="checkbox"
+                      :value="permission.name"
+                      v-model="newUser.routePermissions"
+                    />
                     <span class="checkmark"></span>
                     <div class="permission-info">
-                      <span class="permission-title">{{ permission.title }}</span>
+                      <span class="permission-title">{{
+                        permission.title
+                      }}</span>
                       <span class="permission-path">{{ permission.path }}</span>
                     </div>
                   </label>
@@ -234,11 +331,19 @@
             </div>
           </div>
           <div class="form-actions">
-            <button type="button" class="btn btn-secondary" @click="showAddDialog = false">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              @click="showAddDialog = false"
+            >
               取消
             </button>
-            <button type="submit" class="btn btn-primary" :disabled="addLoading">
-              {{ addLoading ? '添加中...' : '添加用户' }}
+            <button
+              type="submit"
+              class="btn btn-primary"
+              :disabled="addLoading"
+            >
+              {{ addLoading ? "添加中..." : "添加用户" }}
             </button>
           </div>
         </form>
@@ -258,17 +363,34 @@
           <div class="form-row">
             <div class="form-group">
               <label class="form-label">ID</label>
-              <input v-model="editingUser.id" type="text" class="form-input" disabled />
+              <input
+                v-model="editingUser.id"
+                type="text"
+                class="form-input"
+                disabled
+              />
             </div>
             <div class="form-group">
               <label class="form-label">用户名 *</label>
-              <input v-model="editingUser.username" type="text" class="form-input" placeholder="请输入用户名" required />
+              <input
+                v-model="editingUser.username"
+                type="text"
+                class="form-input"
+                placeholder="请输入用户名"
+                required
+              />
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
               <label class="form-label">邮箱 *</label>
-              <input v-model="editingUser.email" type="email" class="form-input" placeholder="请输入邮箱地址" required />
+              <input
+                v-model="editingUser.email"
+                type="email"
+                class="form-input"
+                placeholder="请输入邮箱地址"
+                required
+              />
             </div>
             <div class="form-group">
               <label class="form-label">角色</label>
@@ -289,11 +411,19 @@
             </div>
           </div>
           <div class="form-actions">
-            <button type="button" class="btn btn-secondary" @click="showEditDialog = false">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              @click="showEditDialog = false"
+            >
               取消
             </button>
-            <button type="submit" class="btn btn-primary" :disabled="editLoading">
-              {{ editLoading ? '保存中...' : '保存修改' }}
+            <button
+              type="submit"
+              class="btn btn-primary"
+              :disabled="editLoading"
+            >
+              {{ editLoading ? "保存中..." : "保存修改" }}
             </button>
           </div>
         </form>
@@ -317,11 +447,20 @@
           <p>此操作不可恢复，请谨慎操作。</p>
         </div>
         <div class="form-actions">
-          <button type="button" class="btn btn-secondary" @click="showDeleteDialog = false">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            @click="showDeleteDialog = false"
+          >
             取消
           </button>
-          <button type="button" class="btn btn-danger" @click="performDelete" :disabled="deleteLoading">
-            {{ deleteLoading ? '删除中...' : '确认删除' }}
+          <button
+            type="button"
+            class="btn btn-danger"
+            @click="performDelete"
+            :disabled="deleteLoading"
+          >
+            {{ deleteLoading ? "删除中..." : "确认删除" }}
           </button>
         </div>
       </div>
@@ -351,13 +490,27 @@
             <!-- 用户信息展示 -->
             <div class="user-section">
               <div class="user-header">
-                <div class="user-avatar-large">{{ permissionUser?.username?.charAt(0)?.toUpperCase() }}</div>
+                <div class="user-avatar-large">
+                  {{ permissionUser?.username?.charAt(0)?.toUpperCase() }}
+                </div>
                 <div class="user-details">
                   <h3 class="user-name">{{ permissionUser?.username }}</h3>
                   <p class="user-email">{{ permissionUser?.email }}</p>
                   <span :class="['role-badge', `role-${permissionUser?.role}`]">
-                    <i :class="permissionUser?.role === 'admin' ? 'icon-shield' : 'icon-user'"></i>
-                    {{ permissionUser?.role === 'guest' ? '超级管理员' : permissionUser?.role === 'admin' ? '管理员' : '用户' }}
+                    <i
+                      :class="
+                        permissionUser?.role === 'admin'
+                          ? 'icon-shield'
+                          : 'icon-user'
+                      "
+                    ></i>
+                    {{
+                      permissionUser?.role === "guest"
+                        ? "超级管理员"
+                        : permissionUser?.role === "admin"
+                        ? "管理员"
+                        : "用户"
+                    }}
                   </span>
                 </div>
               </div>
@@ -369,19 +522,28 @@
                 <i class="icon-list"></i>
                 当前权限 ({{ userPermissions.length }} 个)
               </h4>
-              <div v-if="userPermissions.length === 0" class="empty-permissions">
+              <div
+                v-if="userPermissions.length === 0"
+                class="empty-permissions"
+              >
                 <i class="icon-empty"></i>
                 <p>该用户暂未分配任何页面权限</p>
               </div>
               <div v-else class="permissions-grid">
-                <div v-for="permission in userPermissions" :key="permission.name" class="permission-card current">
+                <div
+                  v-for="permission in userPermissions"
+                  :key="permission.name"
+                  class="permission-card current"
+                >
                   <div class="permission-icon">
                     <i class="icon-page"></i>
                   </div>
                   <div class="permission-details">
                     <h5 class="permission-name">{{ permission.title }}</h5>
                     <code class="permission-path">{{ permission.path }}</code>
-                    <p class="permission-desc">{{ permission.description || '暂无描述' }}</p>
+                    <p class="permission-desc">
+                      {{ permission.description || "暂无描述" }}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -395,9 +557,16 @@
                   权限管理
                 </h4>
                 <div class="permission-stats">
-                  <span class="stat">已选择: {{ tempSelectedPermissions.length }}</span>
+                  <span class="stat"
+                    >已选择: {{ tempSelectedPermissions.length }}</span
+                  >
                   <span class="stat">可用: {{ allPermissions.length }}</span>
-                  <span class="stat">剩余: {{ allPermissions.length - tempSelectedPermissions.length }}</span>
+                  <span class="stat"
+                    >剩余:
+                    {{
+                      allPermissions.length - tempSelectedPermissions.length
+                    }}</span
+                  >
                 </div>
               </div>
 
@@ -406,26 +575,52 @@
                 <div class="editor-hint">
                   <i class="icon-info"></i>
                   <span>选择该用户可以访问的页面，更改会立即保存</span>
-                  <span v-if="tempSelectedPermissions.length > 0" class="selection-order-hint">
+                  <span
+                    v-if="tempSelectedPermissions.length > 0"
+                    class="selection-order-hint"
+                  >
                     (选中顺序: {{ getOrderHint() }})
                   </span>
                 </div>
 
                 <div class="permissions-list">
-                  <label v-for="permission in allPermissions" :key="permission.name" class="permission-checkbox" :class="{
-                    'selected': tempSelectedPermissions.includes(permission.name),
-                    'disabled': permissionSaving,
-                    'order-highlight': tempSelectedPermissions.includes(permission.name)
-                  }" :style="getPermissionOrderStyle(permission.name)">
-                    <input type="checkbox" :value="permission.name"
-                      :checked="tempSelectedPermissions.includes(permission.name)" :disabled="permissionSaving"
-                      @change="handlePermissionChange(permission.name, $event)" />
+                  <label
+                    v-for="permission in allPermissions"
+                    :key="permission.name"
+                    class="permission-checkbox"
+                    :class="{
+                      selected: tempSelectedPermissions.includes(
+                        permission.name
+                      ),
+                      disabled: permissionSaving,
+                      'order-highlight': tempSelectedPermissions.includes(
+                        permission.name
+                      ),
+                    }"
+                    :style="getPermissionOrderStyle(permission.name)"
+                  >
+                    <input
+                      type="checkbox"
+                      :value="permission.name"
+                      :checked="
+                        tempSelectedPermissions.includes(permission.name)
+                      "
+                      :disabled="permissionSaving"
+                      @change="handlePermissionChange(permission.name, $event)"
+                    />
                     <span class="checkmark"></span>
                     <div class="permission-info">
-                      <span class="permission-title">{{ permission.title }}</span>
+                      <span class="permission-title">{{
+                        permission.title
+                      }}</span>
                       <code class="permission-path">{{ permission.path }}</code>
-                      <span class="permission-category">{{ permission.category || '未分类' }}</span>
-                      <span v-if="tempSelectedPermissions.includes(permission.name)" class="permission-order-badge">
+                      <span class="permission-category">{{
+                        permission.category || "未分类"
+                      }}</span>
+                      <span
+                        v-if="tempSelectedPermissions.includes(permission.name)"
+                        class="permission-order-badge"
+                      >
                         第 {{ getPermissionOrder(permission.name) }} 个选中
                       </span>
                     </div>
@@ -444,19 +639,31 @@
 
         <!-- 弹窗操作按钮 -->
         <div class="form-actions">
-          <button type="button" class="btn btn-secondary" @click="closePermissionDialog">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            @click="closePermissionDialog"
+          >
             关闭
           </button>
-          <button v-if="isSuperAdmin" type="button" class="btn btn-primary" @click="savePermissionChanges"
-            :disabled="permissionSaving">
-            {{ permissionSaving ? '保存中...' : '保存更改' }}
+          <button
+            v-if="isSuperAdmin"
+            type="button"
+            class="btn btn-primary"
+            @click="savePermissionChanges"
+            :disabled="permissionSaving"
+          >
+            {{ permissionSaving ? "保存中..." : "保存更改" }}
           </button>
         </div>
       </div>
     </div>
 
     <!-- 消息提示 -->
-    <div v-if="message.show" :class="['message-toast', `toast-${message.type}`]">
+    <div
+      v-if="message.show"
+      :class="['message-toast', `toast-${message.type}`]"
+    >
       <i :class="getMessageIcon(message.type)"></i>
       <span>{{ message.text }}</span>
       <button class="toast-close" @click="message.show = false">
@@ -467,27 +674,27 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, watch } from "vue";
 import {
   fetchAvailablePermissions,
   fetchUserRoutePermissions,
-  updateUserRoutePermissions
-} from '@/api/permissions';
+  updateUserRoutePermissions,
+} from "@/api/permissions";
 import {
   fetchUsers,
   deleteUser as apiDeleteUser,
   updateUser as apiUpdateUser,
-  createUser as apiCreateUser
-} from '@/api/userManagement';
-import { useAuthStore } from '@/stores/auth';
+  createUser as apiCreateUser,
+} from "@/api/userManagement";
+import { useAuthStore } from "@/stores/auth";
 
 // 定义用户接口类型 - 明确包含status属性
 interface User {
   id: number;
   username: string;
   email: string;
-  role: 'user' | 'admin' | 'guest';
-  status: 'active' | 'inactive'; // 确保包含status
+  role: "user" | "admin" | "guest";
+  status: "active" | "inactive"; // 确保包含status
   registeredAt?: string;
   permissions?: string[]; // API返回的权限数组
 }
@@ -515,8 +722,8 @@ interface UserData {
   username: string;
   email: string;
   password: string;
-  role: 'user' | 'admin' | 'guest';
-  status: 'active' | 'inactive';
+  role: "user" | "admin" | "guest";
+  status: "active" | "inactive";
   routePermissions?: string[];
 }
 
@@ -534,17 +741,17 @@ const permissionsLoading = ref<boolean>(false);
 
 // 检查是否为超级管理员
 const isSuperAdmin = computed(() => {
-  return authStore.userInfo?.username === 'guest';
+  return authStore.userInfo?.username === "guest";
 });
 
 // 搜索和过滤
-const searchKeyword = ref<string>('');
-const roleFilter = ref<string>('');
-const statusFilter = ref<string>('');
+const searchKeyword = ref<string>("");
+const roleFilter = ref<string>("");
+const statusFilter = ref<string>("");
 
 // 排序
-const sortField = ref<string>('id');
-const sortDirection = ref<string>('asc');
+const sortField = ref<string>("id");
+const sortDirection = ref<string>("asc");
 
 // 分页
 const currentPage = ref<number>(1);
@@ -558,12 +765,12 @@ const showPermissionDialog = ref<boolean>(false);
 
 // 表单数据
 const newUser = ref<UserData>({
-  username: '',
-  email: '',
-  password: '',
-  role: 'user',
-  status: 'active',
-  routePermissions: []
+  username: "",
+  email: "",
+  password: "",
+  role: "user",
+  status: "active",
+  routePermissions: [],
 });
 
 // 修复编辑用户类型问题
@@ -571,14 +778,14 @@ const editingUser = ref<{
   id: number;
   username: string;
   email: string;
-  role: 'user' | 'admin' | 'guest';
-  status: 'active' | 'inactive';
+  role: "user" | "admin" | "guest";
+  status: "active" | "inactive";
 }>({
   id: 0,
-  username: '',
-  email: '',
-  role: 'user',
-  status: 'active'
+  username: "",
+  email: "",
+  role: "user",
+  status: "active",
 });
 
 const userToDelete = ref<User | null>(null);
@@ -622,38 +829,42 @@ function getPermissionOrder(permissionName: string): number {
 }
 
 // 获取权限顺序样式
-function getPermissionOrderStyle(permissionName: string): { [key: string]: string } {
+function getPermissionOrderStyle(permissionName: string): {
+  [key: string]: string;
+} {
   const index = tempSelectedPermissions.value.indexOf(permissionName);
   if (index === -1) return {};
 
   const hue = (index * 30) % 360;
   return {
-    '--order-color': `hsl(${hue}, 70%, 90%)`,
-    '--order-border-color': `hsl(${hue}, 70%, 70%)`
+    "--order-color": `hsl(${hue}, 70%, 90%)`,
+    "--order-border-color": `hsl(${hue}, 70%, 70%)`,
   };
 }
 
 // 获取顺序提示文本
 function getOrderHint(): string {
   if (tempSelectedPermissions.value.length === 0) {
-    return '无选中权限';
+    return "无选中权限";
   }
 
-  return tempSelectedPermissions.value.map((name, index) => {
-    const permission = allPermissions.value.find(p => p.name === name);
-    return `${index + 1}.${permission ? permission.title : name}`;
-  }).join(' → ');
+  return tempSelectedPermissions.value
+    .map((name, index) => {
+      const permission = allPermissions.value.find((p) => p.name === name);
+      return `${index + 1}.${permission ? permission.title : name}`;
+    })
+    .join(" → ");
 }
 
 // 消息提示
 const message = ref<{
   show: boolean;
   text: string;
-  type: 'success' | 'error' | 'warning' | 'info';
+  type: "success" | "error" | "warning" | "info";
 }>({
   show: false,
-  text: '',
-  type: 'info'
+  text: "",
+  type: "info",
 });
 
 // 计算属性 - 修复索引访问问题和未定义值问题
@@ -662,18 +873,23 @@ const filteredUsers = computed<User[]>(() => {
 
   if (searchKeyword.value) {
     const keyword = searchKeyword.value.toLowerCase();
-    filtered = filtered.filter(user =>
-      getUserProperty(user, 'username').toLowerCase().includes(keyword) ||
-      getUserProperty(user, 'email').toLowerCase().includes(keyword)
+    filtered = filtered.filter(
+      (user) =>
+        getUserProperty(user, "username").toLowerCase().includes(keyword) ||
+        getUserProperty(user, "email").toLowerCase().includes(keyword)
     );
   }
 
   if (roleFilter.value) {
-    filtered = filtered.filter(user => getUserProperty(user, 'role') === roleFilter.value);
+    filtered = filtered.filter(
+      (user) => getUserProperty(user, "role") === roleFilter.value
+    );
   }
 
   if (statusFilter.value) {
-    filtered = filtered.filter(user => getUserProperty(user, 'status') === statusFilter.value);
+    filtered = filtered.filter(
+      (user) => getUserProperty(user, "status") === statusFilter.value
+    );
   }
 
   filtered.sort((a, b) => {
@@ -681,12 +897,12 @@ const filteredUsers = computed<User[]>(() => {
     let bVal = b[sortField.value as keyof User];
 
     // 处理数字类型字段
-    if (sortField.value === 'id') {
+    if (sortField.value === "id") {
       aVal = aVal !== undefined ? parseInt(String(aVal)) : 0;
       bVal = bVal !== undefined ? parseInt(String(bVal)) : 0;
     }
     // 处理日期类型字段
-    else if (sortField.value === 'registeredAt') {
+    else if (sortField.value === "registeredAt") {
       aVal = aVal ? new Date(aVal as string).getTime() : 0;
       bVal = bVal ? new Date(bVal as string).getTime() : 0;
     }
@@ -696,29 +912,29 @@ const filteredUsers = computed<User[]>(() => {
       // 字符串字段可以转换为小写进行比较，但首先确保它们不是undefined
       if (aVal !== undefined && bVal !== undefined) {
         // 如果是字符串，确保安全转换
-        if (typeof aVal === 'string' && typeof bVal === 'string') {
+        if (typeof aVal === "string" && typeof bVal === "string") {
           aVal = aVal.toLowerCase();
           bVal = bVal.toLowerCase();
         }
       } else {
         // 如果任一值为undefined，给它们一个默认值以确保排序稳定
-        aVal = '';
-        bVal = '';
+        aVal = "";
+        bVal = "";
       }
     }
 
     // 确保aVal和bVal在进行比较前不是undefined
     // 对于数字比较
-    if (typeof aVal === 'number' && typeof bVal === 'number') {
-      if (sortDirection.value === 'asc') {
+    if (typeof aVal === "number" && typeof bVal === "number") {
+      if (sortDirection.value === "asc") {
         return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
       } else {
         return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
       }
     }
     // 对于字符串比较
-    else if (typeof aVal === 'string' && typeof bVal === 'string') {
-      if (sortDirection.value === 'asc') {
+    else if (typeof aVal === "string" && typeof bVal === "string") {
+      if (sortDirection.value === "asc") {
         return aVal.localeCompare(bVal);
       } else {
         return bVal.localeCompare(aVal);
@@ -726,7 +942,7 @@ const filteredUsers = computed<User[]>(() => {
     }
     // 对于其他类型，提供默认排序
     else {
-      if (sortDirection.value === 'asc') {
+      if (sortDirection.value === "asc") {
         return 0;
       } else {
         return 0;
@@ -748,9 +964,16 @@ const totalPages = computed<number>(() => {
 });
 
 const totalUsers = computed<number>(() => users.value.length);
-const activeUsers = computed<number>(() => users.value.filter(u => getUserProperty(u, 'status') === 'active').length);
-const adminUsers = computed<number>(() => users.value.filter(u => getUserProperty(u, 'role') === 'admin').length);
-const guestUsers = computed<number>(() => users.value.filter(u => getUserProperty(u, 'role') === 'guest').length);
+const activeUsers = computed<number>(
+  () =>
+    users.value.filter((u) => getUserProperty(u, "status") === "active").length
+);
+const adminUsers = computed<number>(
+  () => users.value.filter((u) => getUserProperty(u, "role") === "admin").length
+);
+const guestUsers = computed<number>(
+  () => users.value.filter((u) => getUserProperty(u, "role") === "guest").length
+);
 
 // 监听过滤条件变化，重置页码
 watch([searchKeyword, roleFilter, statusFilter], () => {
@@ -758,11 +981,15 @@ watch([searchKeyword, roleFilter, statusFilter], () => {
 });
 
 // 消息提示函数
-function showMessage(text: string, type: 'success' | 'error' | 'warning' | 'info' = 'info', duration: number = 3000): void {
+function showMessage(
+  text: string,
+  type: "success" | "error" | "warning" | "info" = "info",
+  duration: number = 3000
+): void {
   message.value = {
     show: true,
     text,
-    type
+    type,
   };
 
   setTimeout(() => {
@@ -772,14 +999,14 @@ function showMessage(text: string, type: 'success' | 'error' | 'warning' | 'info
 
 // 格式化日期
 function formatDate(dateString?: string): string {
-  if (!dateString) return '-';
+  if (!dateString) return "-";
   const date = new Date(dateString);
-  return date.toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
+  return date.toLocaleDateString("zh-CN", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 }
 
@@ -801,55 +1028,73 @@ async function viewUserPermissions(user: User): Promise<void> {
       // 处理 permissions 数据
       if (result.data.permissions) {
         // 方案1: 如果权限数据已经是我们期望的格式 (有 name 和 title 属性)
-        if (Array.isArray(result.data.permissions) &&
+        if (
+          Array.isArray(result.data.permissions) &&
           result.data.permissions.length > 0 &&
-          'name' in result.data.permissions[0] &&
-          'title' in result.data.permissions[0]) {
+          "name" in result.data.permissions[0] &&
+          "title" in result.data.permissions[0]
+        ) {
           userPermissions.value = result.data.permissions as Permission[];
         }
         // 方案2: 如果权限数据格式不同，进行转换
         else if (Array.isArray(result.data.permissions)) {
-          userPermissions.value = (result.data.permissions as Array<{ name: string; title: string;[key: string]: any }>).map((p: any) => ({
+          userPermissions.value = (
+            result.data.permissions as Array<{
+              name: string;
+              title: string;
+              [key: string]: any;
+            }>
+          ).map((p: any) => ({
             name: p.name,
             title: p.title,
-            category: p.category || '', // 确保category有默认值
+            category: p.category || "", // 确保category有默认值
             path: p.path,
-            description: p.description
+            description: p.description,
           })) as Permission[];
         }
       }
 
       // 处理 allAvailablePermissions 数据
       if (result.data.allAvailablePermissions) {
-        if (Array.isArray(result.data.allAvailablePermissions) &&
+        if (
+          Array.isArray(result.data.allAvailablePermissions) &&
           result.data.allAvailablePermissions.length > 0 &&
-          'name' in result.data.allAvailablePermissions[0] &&
-          'title' in result.data.allAvailablePermissions[0]) {
-          allPermissions.value = result.data.allAvailablePermissions as Permission[];
-        }
-        else if (Array.isArray(result.data.allAvailablePermissions)) {
-          allPermissions.value = (result.data.allAvailablePermissions as Array<{ name: string; title: string;[key: string]: any }>).map((p: any) => ({
+          "name" in result.data.allAvailablePermissions[0] &&
+          "title" in result.data.allAvailablePermissions[0]
+        ) {
+          allPermissions.value = result.data
+            .allAvailablePermissions as Permission[];
+        } else if (Array.isArray(result.data.allAvailablePermissions)) {
+          allPermissions.value = (
+            result.data.allAvailablePermissions as Array<{
+              name: string;
+              title: string;
+              [key: string]: any;
+            }>
+          ).map((p: any) => ({
             name: p.name,
             title: p.title,
-            category: p.category || '', // 确保category有默认值
+            category: p.category || "", // 确保category有默认值
             path: p.path,
-            description: p.description
+            description: p.description,
           })) as Permission[];
         }
       }
 
       // 设置选中的权限
       if (userPermissions.value.length > 0) {
-        tempSelectedPermissions.value = userPermissions.value.map(p => p.name);
+        tempSelectedPermissions.value = userPermissions.value.map(
+          (p) => p.name
+        );
       }
     } else {
-      console.error('API返回错误:', result.message);
-      showMessage(result.message || '获取用户权限失败', 'error');
+      console.error("API返回错误:", result.message);
+      showMessage(result.message || "获取用户权限失败", "error");
       showPermissionDialog.value = false;
     }
   } catch (error) {
-    console.error('查看用户权限异常:', error);
-    showMessage('查看用户权限失败，请重试', 'error');
+    console.error("查看用户权限异常:", error);
+    showMessage("查看用户权限失败，请重试", "error");
     showPermissionDialog.value = false;
   } finally {
     permissionLoading.value = false;
@@ -859,7 +1104,7 @@ async function viewUserPermissions(user: User): Promise<void> {
 // 保存用户权限更改
 async function savePermissionChanges(): Promise<void> {
   if (!permissionUser.value || !isSuperAdmin.value) {
-    showMessage('没有权限修改用户权限', 'error');
+    showMessage("没有权限修改用户权限", "error");
     return;
   }
 
@@ -871,20 +1116,20 @@ async function savePermissionChanges(): Promise<void> {
     );
 
     if (result.success) {
-      userPermissions.value = allPermissions.value.filter(p =>
+      userPermissions.value = allPermissions.value.filter((p) =>
         tempSelectedPermissions.value.includes(p.name)
       );
 
-      showMessage('用户权限更新成功', 'success');
+      showMessage("用户权限更新成功", "success");
     } else {
-      console.error('API返回错误:', result.message);
-      showMessage(result.message || '更新用户权限失败', 'error');
-      tempSelectedPermissions.value = userPermissions.value.map(p => p.name);
+      console.error("API返回错误:", result.message);
+      showMessage(result.message || "更新用户权限失败", "error");
+      tempSelectedPermissions.value = userPermissions.value.map((p) => p.name);
     }
   } catch (error) {
-    console.error('保存权限异常:', error);
-    showMessage('保存权限失败，请重试', 'error');
-    tempSelectedPermissions.value = userPermissions.value.map(p => p.name);
+    console.error("保存权限异常:", error);
+    showMessage("保存权限失败，请重试", "error");
+    tempSelectedPermissions.value = userPermissions.value.map((p) => p.name);
   } finally {
     permissionSaving.value = false;
   }
@@ -892,7 +1137,7 @@ async function savePermissionChanges(): Promise<void> {
 
 // 取消权限编辑
 function cancelPermissionEdit(): void {
-  tempSelectedPermissions.value = userPermissions.value.map(p => p.name);
+  tempSelectedPermissions.value = userPermissions.value.map((p) => p.name);
 }
 
 // 关闭权限弹窗
@@ -917,29 +1162,39 @@ async function loadAvailablePermissions(): Promise<void> {
       // 处理权限数据，确保类型安全
       if (Array.isArray(result.data)) {
         // 方案1: 数据已经是正确的Permission类型
-        if (result.data.length > 0 && 'name' in result.data[0] && 'title' in result.data[0]) {
+        if (
+          result.data.length > 0 &&
+          "name" in result.data[0] &&
+          "title" in result.data[0]
+        ) {
           availablePermissions.value = result.data as Permission[];
         }
         // 方案2: 数据格式不同，进行转换
         else {
-          availablePermissions.value = (result.data as Array<{ name: string; title: string;[key: string]: any }>).map((p: any) => ({
+          availablePermissions.value = (
+            result.data as Array<{
+              name: string;
+              title: string;
+              [key: string]: any;
+            }>
+          ).map((p: any) => ({
             name: p.name,
             title: p.title,
-            category: p.category || '', // 确保category有默认值
+            category: p.category || "", // 确保category有默认值
             path: p.path,
-            description: p.description
+            description: p.description,
           })) as Permission[];
         }
       } else {
         availablePermissions.value = [];
       }
     } else {
-      console.error('API返回错误:', result.message);
-      showMessage(result.message || '获取可用权限失败', 'error');
+      console.error("API返回错误:", result.message);
+      showMessage(result.message || "获取可用权限失败", "error");
     }
   } catch (error) {
-    console.error('获取可用权限异常:', error);
-    showMessage('获取可用权限失败，请检查网络连接', 'error');
+    console.error("获取可用权限异常:", error);
+    showMessage("获取可用权限失败，请检查网络连接", "error");
   } finally {
     permissionsLoading.value = false;
   }
@@ -953,30 +1208,31 @@ async function loadUsers(): Promise<void> {
     const result = await fetchUsers();
 
     if (result.success && result.data) {
-      users.value = result.data.map(user => {
+      users.value = result.data.map((user) => {
         // 确保每个用户都有status属性，如果API没有返回则默认为'active'
-        const userStatus = (user as any).status !== undefined ? (user as any).status : 'active';
+        const userStatus =
+          (user as any).status !== undefined ? (user as any).status : "active";
 
         return {
           id: user.id,
           username: user.username,
           email: user.email,
-          role: user.permissions?.includes('guest')
-            ? 'guest'
-            : user.permissions?.includes('admin')
-              ? 'admin'
-              : 'user',
-          status: userStatus as 'active' | 'inactive', // 确保类型正确
-          registeredAt: user.registeredAt
+          role: user.permissions?.includes("guest")
+            ? "guest"
+            : user.permissions?.includes("admin")
+            ? "admin"
+            : "user",
+          status: userStatus as "active" | "inactive", // 确保类型正确
+          registeredAt: user.registeredAt,
         };
       });
     } else {
-      console.error('API返回错误:', result.message);
-      showMessage(result.message || '获取用户列表失败', 'error');
+      console.error("API返回错误:", result.message);
+      showMessage(result.message || "获取用户列表失败", "error");
     }
   } catch (error) {
-    console.error('获取用户列表异常:', error);
-    showMessage('获取用户列表失败，请检查网络连接或重启Mock服务器', 'error');
+    console.error("获取用户列表异常:", error);
+    showMessage("获取用户列表失败，请检查网络连接或重启Mock服务器", "error");
   } finally {
     loading.value = false;
   }
@@ -985,23 +1241,23 @@ async function loadUsers(): Promise<void> {
 // 排序功能
 function sortBy(field: string): void {
   if (sortField.value === field) {
-    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+    sortDirection.value = sortDirection.value === "asc" ? "desc" : "asc";
   } else {
     sortField.value = field;
-    sortDirection.value = 'asc';
+    sortDirection.value = "asc";
   }
 }
 
 function getSortIcon(field: string): string {
   if (sortField.value !== field) {
-    return 'icon-sort';
+    return "icon-sort";
   }
-  return sortDirection.value === 'asc' ? 'icon-sort-up' : 'icon-sort-down';
+  return sortDirection.value === "asc" ? "icon-sort-up" : "icon-sort-down";
 }
 
 function handleAddUser(): void {
   if (isSuperAdmin.value === false) {
-    showMessage('你没有权限添加用户', 'info');
+    showMessage("你没有权限添加用户", "info");
     return;
   } else {
     showAddDialog.value = true;
@@ -1017,30 +1273,32 @@ async function addUser(): Promise<void> {
       username: newUser.value.username,
       email: newUser.value.email,
       password: newUser.value.password,
-      permissions: newUser.value.role === 'admin' ? ['admin'] : [],
+      permissions: newUser.value.role === "admin" ? ["admin"] : [],
       status: newUser.value.status,
-      routePermissions: isSuperAdmin.value ? newUser.value.routePermissions : []
+      routePermissions: isSuperAdmin.value
+        ? newUser.value.routePermissions
+        : [],
     });
 
     if (result.success) {
       showAddDialog.value = false;
       newUser.value = {
-        username: '',
-        email: '',
-        password: '',
-        role: 'user',
-        status: 'active',
-        routePermissions: []
+        username: "",
+        email: "",
+        password: "",
+        role: "user",
+        status: "active",
+        routePermissions: [],
       };
       await loadUsers();
-      showMessage('用户添加成功', 'success');
+      showMessage("用户添加成功", "success");
     } else {
-      console.error('API返回错误:', result.message);
-      showMessage(result.message || '添加用户失败', 'error');
+      console.error("API返回错误:", result.message);
+      showMessage(result.message || "添加用户失败", "error");
     }
   } catch (error) {
-    console.error('添加用户异常:', error);
-    showMessage('添加用户失败，请重试', 'error');
+    console.error("添加用户异常:", error);
+    showMessage("添加用户失败，请重试", "error");
   } finally {
     addLoading.value = false;
   }
@@ -1049,7 +1307,7 @@ async function addUser(): Promise<void> {
 // 编辑用户
 function editUser(user: User): void {
   if (isSuperAdmin.value === false) {
-    showMessage('你没有权限修改用户信息', 'info');
+    showMessage("你没有权限修改用户信息", "info");
     return;
   }
   editingUser.value = {
@@ -1057,7 +1315,7 @@ function editUser(user: User): void {
     username: user.username,
     email: user.email,
     role: user.role,
-    status: user.status
+    status: user.status,
   };
   showEditDialog.value = true;
 }
@@ -1070,21 +1328,21 @@ async function updateUser(): Promise<void> {
     const result = await apiUpdateUser(editingUser.value.id, {
       username: editingUser.value.username,
       email: editingUser.value.email,
-      permissions: editingUser.value.role === 'admin' ? ['admin'] : [],
-      status: editingUser.value.status
+      permissions: editingUser.value.role === "admin" ? ["admin"] : [],
+      status: editingUser.value.status,
     });
 
     if (result.success) {
       showEditDialog.value = false;
       await loadUsers();
-      showMessage('用户信息更新成功', 'success');
+      showMessage("用户信息更新成功", "success");
     } else {
-      console.error('API返回错误:', result.message);
-      showMessage(result.message || '更新用户失败', 'error');
+      console.error("API返回错误:", result.message);
+      showMessage(result.message || "更新用户失败", "error");
     }
   } catch (error) {
-    console.error('更新用户异常:', error);
-    showMessage('更新用户失败，请重试', 'error');
+    console.error("更新用户异常:", error);
+    showMessage("更新用户失败，请重试", "error");
   } finally {
     editLoading.value = false;
   }
@@ -1093,7 +1351,7 @@ async function updateUser(): Promise<void> {
 // 确认删除
 function confirmDelete(user: User): void {
   if (isSuperAdmin.value === false) {
-    showMessage('你没有权限删除', 'info');
+    showMessage("你没有权限删除", "info");
   } else {
     userToDelete.value = user;
     showDeleteDialog.value = true;
@@ -1110,15 +1368,15 @@ async function performDelete(): Promise<void> {
     const result = await apiDeleteUser(userToDelete.value.id);
 
     if (result.success) {
-      showMessage(`用户 "${userToDelete.value.username}" 删除成功`, 'success');
+      showMessage(`用户 "${userToDelete.value.username}" 删除成功`, "success");
       await loadUsers();
     } else {
-      console.error('API返回错误:', result.message);
-      showMessage(result.message || '删除用户失败', 'error');
+      console.error("API返回错误:", result.message);
+      showMessage(result.message || "删除用户失败", "error");
     }
   } catch (error) {
-    console.error('删除用户异常:', error);
-    showMessage('删除用户失败，请检查网络连接', 'error');
+    console.error("删除用户异常:", error);
+    showMessage("删除用户失败，请检查网络连接", "error");
   } finally {
     deleteLoading.value = false;
     showDeleteDialog.value = false;
@@ -1127,14 +1385,16 @@ async function performDelete(): Promise<void> {
 }
 
 // 获取消息图标
-function getMessageIcon(type: 'success' | 'error' | 'warning' | 'info'): string {
+function getMessageIcon(
+  type: "success" | "error" | "warning" | "info"
+): string {
   const icons = {
-    success: 'icon-check',
-    error: 'icon-error',
-    warning: 'icon-warning',
-    info: 'icon-info'
+    success: "icon-check",
+    error: "icon-error",
+    warning: "icon-warning",
+    info: "icon-info",
   };
-  return icons[type] || 'icon-info';
+  return icons[type] || "icon-info";
 }
 
 // 组件挂载时加载数据
@@ -1169,7 +1429,8 @@ onMounted(async (): Promise<void> => {
   --radius-lg: 12px;
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
 /* 重置和基础样式 */
@@ -1183,7 +1444,8 @@ onMounted(async (): Promise<void> => {
   padding: 24px;
   min-height: 100vh;
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Microsoft YaHei', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Microsoft YaHei", sans-serif;
 }
 
 /* 页面头部优化 */
@@ -1332,7 +1594,7 @@ onMounted(async (): Promise<void> => {
 }
 
 .stat-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -1526,7 +1788,7 @@ onMounted(async (): Promise<void> => {
 .id-cell {
   font-weight: 600;
   color: var(--gray-700);
-  font-family: 'Monaco', 'Consolas', monospace;
+  font-family: "Monaco", "Consolas", monospace;
 }
 
 .email-cell {
@@ -1606,7 +1868,7 @@ onMounted(async (): Promise<void> => {
 }
 
 .btn-action::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   border-radius: inherit;
@@ -1679,7 +1941,7 @@ onMounted(async (): Promise<void> => {
 }
 
 .btn::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   left: 50%;
@@ -2021,7 +2283,6 @@ onMounted(async (): Promise<void> => {
 }
 
 @keyframes pulse {
-
   0%,
   100% {
     transform: scale(1);
@@ -2125,77 +2386,77 @@ onMounted(async (): Promise<void> => {
 
 /* 图标优化 */
 .icon-users::before {
-  content: '👥';
+  content: "👥";
 }
 
 .icon-plus::before {
-  content: '+';
+  content: "+";
   font-weight: bold;
 }
 
 .icon-search::before {
-  content: '🔍';
+  content: "🔍";
 }
 
 .icon-edit::before {
-  content: '✏️';
+  content: "✏️";
 }
 
 .icon-delete::before {
-  content: '🗑️';
+  content: "🗑️";
 }
 
 .icon-close::before {
-  content: '✕';
+  content: "✕";
   font-weight: bold;
 }
 
 .icon-check::before {
-  content: '✓';
+  content: "✓";
   font-weight: bold;
 }
 
 .icon-error::before {
-  content: '⚠️';
+  content: "⚠️";
 }
 
 .icon-warning::before {
-  content: '⚠️';
+  content: "⚠️";
 }
 
 .icon-info::before {
-  content: 'ℹ️';
+  content: "ℹ️";
 }
 
 .icon-shield::before {
-  content: '🛡️';
+  content: "🛡️";
 }
 
 .icon-user::before {
-  content: '👤';
+  content: "👤";
 }
 
 .icon-pause::before {
-  content: '⏸️';
+  content: "⏸️";
 }
 
 .icon-sort::before {
-  content: '↕️';
+  content: "↕️";
   opacity: 0.5;
 }
 
 .icon-sort-up::before {
-  content: '↑';
+  content: "↑";
   color: var(--primary-color);
 }
 
 .icon-sort-down::before {
-  content: '↓';
+  content: "↓";
   color: var(--primary-color);
 }
 
 .icon-empty::before {
-  content: '📁';
+  content: "📁";
   font-size: 64px;
   opacity: 0.3;
 }
@@ -2364,13 +2625,13 @@ onMounted(async (): Promise<void> => {
   margin-top: 2px;
 }
 
-.permission-checkbox input[type="checkbox"]:checked+.checkmark {
+.permission-checkbox input[type="checkbox"]:checked + .checkmark {
   background: var(--primary-color);
   border-color: var(--primary-color);
 }
 
-.permission-checkbox input[type="checkbox"]:checked+.checkmark::after {
-  content: '';
+.permission-checkbox input[type="checkbox"]:checked + .checkmark::after {
+  content: "";
   position: absolute;
   left: 5px;
   top: 2px;
@@ -2399,7 +2660,7 @@ onMounted(async (): Promise<void> => {
   display: block;
   font-size: 12px;
   color: var(--gray-500);
-  font-family: 'Monaco', 'Consolas', monospace;
+  font-family: "Monaco", "Consolas", monospace;
   background: var(--gray-100);
   padding: 2px 6px;
   border-radius: 3px;
@@ -2443,7 +2704,7 @@ onMounted(async (): Promise<void> => {
 }
 
 .permission-checkbox::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 4px;
   top: 50%;
@@ -2642,7 +2903,7 @@ onMounted(async (): Promise<void> => {
   padding: 2px 6px;
   border-radius: 3px;
   margin-bottom: 8px;
-  font-family: 'Monaco', 'Consolas', monospace;
+  font-family: "Monaco", "Consolas", monospace;
 }
 
 .permission-desc {
@@ -2747,23 +3008,23 @@ onMounted(async (): Promise<void> => {
 
 /* 新增图标 */
 .icon-eye::before {
-  content: '👁️';
+  content: "👁️";
 }
 
 .icon-page::before {
-  content: '📄';
+  content: "📄";
 }
 
 .icon-list::before {
-  content: '📋';
+  content: "📋";
 }
 
 .icon-settings::before {
-  content: '⚙️';
+  content: "⚙️";
 }
 
 .icon-lock::before {
-  content: '🔒';
+  content: "🔒";
 }
 
 /* 响应式设计 */

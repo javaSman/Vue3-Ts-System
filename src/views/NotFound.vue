@@ -4,13 +4,9 @@
       <div class="error-content">
         <div class="error-code">404</div>
         <h1 class="error-title">页面未找到</h1>
-        <p class="error-message">
-          抱歉，您访问的页面不存在或已被移动。
-        </p>
+        <p class="error-message">抱歉，您访问的页面不存在或已被移动。</p>
         <div class="action-buttons">
-          <button class="btn btn-primary" @click="goBack">
-            ← 返回上一页
-          </button>
+          <button class="btn btn-primary" @click="goBack">← 返回上一页</button>
           <button class="btn btn-secondary" @click="goToLogin">
             🔐 返回登录页
           </button>
@@ -18,12 +14,12 @@
             🔄 刷新页面
           </button>
         </div>
-        
+
         <!-- 调试信息 -->
         <div v-if="showDebug" class="debug-info">
-          <p>认证状态: {{ isAuthenticated ? '已认证' : '未认证' }}</p>
+          <p>认证状态: {{ isAuthenticated ? "已认证" : "未认证" }}</p>
           <p>当前路径: {{ currentPath }}</p>
-          <p>可用路由: {{ availableRoutes.join(', ') }}</p>
+          <p>可用路由: {{ availableRoutes.join(", ") }}</p>
         </div>
       </div>
     </div>
@@ -31,9 +27,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { useAuthStore } from '@/stores/auth';
+import { ref, computed, onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
 
 const router = useRouter();
 const route = useRoute();
@@ -45,10 +41,11 @@ const showDebug = ref(true); // 开发时显示调试信息
 const isAuthenticated = computed(() => authStore.isAuthenticated);
 const currentPath = computed(() => route.fullPath);
 const availableRoutes = computed(() => {
-  return router.getRoutes()
-    .filter(r => !r.path.includes(':')) // 排除动态路由
-    .map(r => r.path)
-    .filter(path => path !== '/' && path !== '*'); // 排除根路径和通配符
+  return router
+    .getRoutes()
+    .filter((r) => !r.path.includes(":")) // 排除动态路由
+    .map((r) => r.path)
+    .filter((path) => path !== "/" && path !== "*"); // 排除根路径和通配符
 });
 
 // 返回上一页
@@ -63,18 +60,18 @@ function goBack() {
 
 // 直接跳转到登录页
 function goToLogin() {
-  console.log('跳转到登录页');
-  
+  console.log("跳转到登录页");
+
   // 确保清除任何可能的路由状态
   if (authStore.isAuthenticated) {
-    console.log('用户已认证，执行退出登录');
+    console.log("用户已认证，执行退出登录");
     authStore.logout();
   }
-  
+
   // 直接跳转到登录页，不带重定向参数
-  router.push({ 
-    name: 'Login',
-    query: {} // 清除所有查询参数
+  router.push({
+    name: "Login",
+    query: {}, // 清除所有查询参数
   });
 }
 
@@ -86,14 +83,14 @@ function forceReload() {
 // 添加键盘快捷键
 onMounted(() => {
   const handleKeyPress = (event: KeyboardEvent) => {
-    if (event.key === 'Escape') {
+    if (event.key === "Escape") {
       goBack();
-    } else if (event.key === 'Enter') {
+    } else if (event.key === "Enter") {
       goToLogin();
     }
   };
 
-  window.addEventListener('keydown', handleKeyPress);
+  window.addEventListener("keydown", handleKeyPress);
 });
 </script>
 
@@ -203,7 +200,7 @@ onMounted(() => {
 
 .debug-info p {
   margin: 8px 0;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
 }
 
 /* 响应式设计 */
@@ -211,25 +208,25 @@ onMounted(() => {
   .error-code {
     font-size: 80px;
   }
-  
+
   .error-title {
     font-size: 28px;
   }
-  
+
   .error-message {
     font-size: 16px;
   }
-  
+
   .action-buttons {
     flex-direction: column;
     align-items: center;
   }
-  
+
   .btn {
     width: 100%;
     max-width: 250px;
   }
-  
+
   .container {
     padding: 20px;
   }

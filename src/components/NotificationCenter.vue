@@ -5,7 +5,7 @@
       <div class="notification-icon">
         🔔
         <span v-if="unreadCount > 0" class="notification-badge">
-          {{ unreadCount > 99 ? '99+' : unreadCount }}
+          {{ unreadCount > 99 ? "99+" : unreadCount }}
         </span>
       </div>
     </div>
@@ -15,8 +15,8 @@
       <div class="panel-header">
         <h3>通知中心</h3>
         <div class="header-actions">
-          <button 
-            v-if="notifications.some(n => !n.read)" 
+          <button
+            v-if="notifications.some((n) => !n.read)"
             @click="markAllAsRead"
             class="btn btn-sm btn-text"
           >
@@ -29,14 +29,16 @@
       </div>
 
       <div class="panel-filters">
-        <button 
-          v-for="filter in filters" 
+        <button
+          v-for="filter in filters"
           :key="filter.key"
           @click="activeFilter = filter.key"
           :class="['filter-btn', { active: activeFilter === filter.key }]"
         >
           {{ filter.label }}
-          <span v-if="filter.count > 0" class="filter-count">{{ filter.count }}</span>
+          <span v-if="filter.count > 0" class="filter-count">{{
+            filter.count
+          }}</span>
         </button>
       </div>
 
@@ -48,39 +50,43 @@
 
         <div v-else-if="filteredNotifications.length === 0" class="empty-state">
           <div class="empty-icon">📭</div>
-          <p>{{ activeFilter === 'unread' ? '没有未读通知' : '暂无通知' }}</p>
+          <p>{{ activeFilter === "unread" ? "没有未读通知" : "暂无通知" }}</p>
         </div>
 
         <div v-else class="notification-list">
-          <div 
-            v-for="notification in filteredNotifications" 
+          <div
+            v-for="notification in filteredNotifications"
             :key="notification.id"
             :class="[
-              'notification-item', 
+              'notification-item',
               notification.type,
-              { unread: !notification.read }
+              { unread: !notification.read },
             ]"
             @click="handleNotificationClick(notification)"
           >
             <div class="notification-icon">
               {{ getNotificationIcon(notification.type) }}
             </div>
-            
+
             <div class="notification-content">
               <div class="notification-header">
                 <h4 class="notification-title">{{ notification.title }}</h4>
-                <span class="notification-time">{{ formatTime(notification.createdAt) }}</span>
+                <span class="notification-time">{{
+                  formatTime(notification.createdAt)
+                }}</span>
               </div>
-              
+
               <p class="notification-message">{{ notification.message }}</p>
-              
+
               <div v-if="notification.actionUrl" class="notification-action">
-                <button class="action-btn">{{ notification.actionText || '查看详情' }}</button>
+                <button class="action-btn">
+                  {{ notification.actionText || "查看详情" }}
+                </button>
               </div>
             </div>
 
             <div class="notification-controls">
-              <button 
+              <button
                 v-if="!notification.read"
                 @click.stop="markAsRead(notification.id)"
                 class="control-btn"
@@ -88,7 +94,7 @@
               >
                 ✓
               </button>
-              <button 
+              <button
                 @click.stop="deleteNotification(notification.id)"
                 class="control-btn delete"
                 title="删除"
@@ -101,27 +107,35 @@
       </div>
 
       <div v-if="hasMore" class="panel-footer">
-        <button @click="loadMore" class="btn btn-load-more" :disabled="loadingMore">
-          {{ loadingMore ? '加载中...' : '加载更多' }}
+        <button
+          @click="loadMore"
+          class="btn btn-load-more"
+          :disabled="loadingMore"
+        >
+          {{ loadingMore ? "加载中..." : "加载更多" }}
         </button>
       </div>
     </div>
 
     <!-- 遮罩层 -->
-    <div v-if="showPanel" class="notification-overlay" @click="showPanel = false"></div>
+    <div
+      v-if="showPanel"
+      class="notification-overlay"
+      @click="showPanel = false"
+    ></div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { 
+import { ref, computed, onMounted, onUnmounted } from "vue";
+import {
   fetchNotifications,
   markNotificationAsRead,
   markMultipleNotificationsAsRead,
   deleteNotification as deleteNotificationApi,
   getUnreadNotificationCount,
-  type Notification
-} from '@/api/notification';
+  type Notification,
+} from "@/api/notification";
 
 // 响应式数据
 const showPanel = ref(false);
@@ -129,36 +143,40 @@ const notifications = ref<Notification[]>([]);
 const loading = ref(false);
 const loadingMore = ref(false);
 const unreadCount = ref(0);
-const activeFilter = ref('all');
+const activeFilter = ref("all");
 const currentPage = ref(1);
 const hasMore = ref(true);
 
 // 筛选器
 const filters = computed(() => [
-  { 
-    key: 'all', 
-    label: '全部', 
-    count: notifications.value.length 
+  {
+    key: "all",
+    label: "全部",
+    count: notifications.value.length,
   },
-  { 
-    key: 'unread', 
-    label: '未读', 
-    count: notifications.value.filter(n => !n.read).length 
+  {
+    key: "unread",
+    label: "未读",
+    count: notifications.value.filter((n) => !n.read).length,
   },
-  { 
-    key: 'important', 
-    label: '重要', 
-    count: notifications.value.filter(n => n.priority === 'high' || n.priority === 'urgent').length 
-  }
+  {
+    key: "important",
+    label: "重要",
+    count: notifications.value.filter(
+      (n) => n.priority === "high" || n.priority === "urgent"
+    ).length,
+  },
 ]);
 
 // 过滤后的通知
 const filteredNotifications = computed(() => {
   switch (activeFilter.value) {
-    case 'unread':
-      return notifications.value.filter(n => !n.read);
-    case 'important':
-      return notifications.value.filter(n => n.priority === 'high' || n.priority === 'urgent');
+    case "unread":
+      return notifications.value.filter((n) => !n.read);
+    case "important":
+      return notifications.value.filter(
+        (n) => n.priority === "high" || n.priority === "urgent"
+      );
     default:
       return notifications.value;
   }
@@ -178,16 +196,16 @@ async function loadNotifications() {
   try {
     const response = await fetchNotifications({
       page: 1,
-      limit: 20
+      limit: 20,
     });
-    
+
     if (response.success) {
       notifications.value = response.data.notifications;
       hasMore.value = response.data.hasMore;
       currentPage.value = 1;
     }
   } catch (error) {
-    console.error('加载通知失败:', error);
+    console.error("加载通知失败:", error);
   } finally {
     loading.value = false;
   }
@@ -199,16 +217,16 @@ async function loadMore() {
   try {
     const response = await fetchNotifications({
       page: currentPage.value + 1,
-      limit: 20
+      limit: 20,
     });
-    
+
     if (response.success) {
       notifications.value.push(...response.data.notifications);
       hasMore.value = response.data.hasMore;
       currentPage.value++;
     }
   } catch (error) {
-    console.error('加载更多通知失败:', error);
+    console.error("加载更多通知失败:", error);
   } finally {
     loadingMore.value = false;
   }
@@ -219,7 +237,9 @@ async function markAsRead(notificationId: string) {
   try {
     const response = await markNotificationAsRead(notificationId);
     if (response.success) {
-      const notification = notifications.value.find(n => n.id === notificationId);
+      const notification = notifications.value.find(
+        (n) => n.id === notificationId
+      );
       if (notification) {
         notification.read = true;
         notification.readAt = new Date().toISOString();
@@ -227,22 +247,20 @@ async function markAsRead(notificationId: string) {
       updateUnreadCount();
     }
   } catch (error) {
-    console.error('标记通知为已读失败:', error);
+    console.error("标记通知为已读失败:", error);
   }
 }
 
 // 全部标记为已读
 async function markAllAsRead() {
-  const unreadIds = notifications.value
-    .filter(n => !n.read)
-    .map(n => n.id);
-    
+  const unreadIds = notifications.value.filter((n) => !n.read).map((n) => n.id);
+
   if (unreadIds.length === 0) return;
 
   try {
     const response = await markMultipleNotificationsAsRead(unreadIds);
     if (response.success) {
-      notifications.value.forEach(n => {
+      notifications.value.forEach((n) => {
         if (!n.read) {
           n.read = true;
           n.readAt = new Date().toISOString();
@@ -251,25 +269,27 @@ async function markAllAsRead() {
       updateUnreadCount();
     }
   } catch (error) {
-    console.error('批量标记通知为已读失败:', error);
+    console.error("批量标记通知为已读失败:", error);
   }
 }
 
 // 删除通知
 async function deleteNotification(notificationId: string) {
-  if (!confirm('确定要删除这条通知吗？')) return;
+  if (!confirm("确定要删除这条通知吗？")) return;
 
   try {
     const response = await deleteNotificationApi(notificationId);
     if (response.success) {
-      const index = notifications.value.findIndex(n => n.id === notificationId);
+      const index = notifications.value.findIndex(
+        (n) => n.id === notificationId
+      );
       if (index > -1) {
         notifications.value.splice(index, 1);
       }
       updateUnreadCount();
     }
   } catch (error) {
-    console.error('删除通知失败:', error);
+    console.error("删除通知失败:", error);
   }
 }
 
@@ -282,19 +302,19 @@ function handleNotificationClick(notification: Notification) {
 
   // 如果有操作链接，跳转
   if (notification.actionUrl) {
-    window.open(notification.actionUrl, '_blank');
+    window.open(notification.actionUrl, "_blank");
   }
 }
 
 // 获取通知图标
 function getNotificationIcon(type: string) {
   const icons = {
-    info: 'ℹ️',
-    success: '✅',
-    warning: '⚠️',
-    error: '❌'
+    info: "ℹ️",
+    success: "✅",
+    warning: "⚠️",
+    error: "❌",
   };
-  return icons[type as keyof typeof icons] || 'ℹ️';
+  return icons[type as keyof typeof icons] || "ℹ️";
 }
 
 // 格式化时间
@@ -302,17 +322,17 @@ function formatTime(timestamp: string) {
   const now = new Date();
   const time = new Date(timestamp);
   const diff = now.getTime() - time.getTime();
-  
+
   const minutes = Math.floor(diff / (1000 * 60));
   const hours = Math.floor(diff / (1000 * 60 * 60));
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  
-  if (minutes < 1) return '刚刚';
+
+  if (minutes < 1) return "刚刚";
   if (minutes < 60) return `${minutes}分钟前`;
   if (hours < 24) return `${hours}小时前`;
   if (days < 7) return `${days}天前`;
-  
-  return time.toLocaleDateString('zh-CN');
+
+  return time.toLocaleDateString("zh-CN");
 }
 
 // 更新未读数量
@@ -323,13 +343,13 @@ async function updateUnreadCount() {
       unreadCount.value = response.count;
     }
   } catch (error) {
-    console.error('获取未读通知数量失败:', error);
+    console.error("获取未读通知数量失败:", error);
   }
 }
 
 // 键盘事件处理
 function handleKeydown(event: KeyboardEvent) {
-  if (event.key === 'Escape' && showPanel.value) {
+  if (event.key === "Escape" && showPanel.value) {
     showPanel.value = false;
   }
 }
@@ -337,14 +357,14 @@ function handleKeydown(event: KeyboardEvent) {
 // 生命周期
 onMounted(() => {
   updateUnreadCount();
-  document.addEventListener('keydown', handleKeydown);
-  
+  document.addEventListener("keydown", handleKeydown);
+
   // 定期更新未读数量
   setInterval(updateUnreadCount, 30000); // 每30秒更新一次
 });
 
 onUnmounted(() => {
-  document.removeEventListener('keydown', handleKeydown);
+  document.removeEventListener("keydown", handleKeydown);
 });
 </script>
 
@@ -520,8 +540,12 @@ onUnmounted(() => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .empty-state {
@@ -688,11 +712,11 @@ onUnmounted(() => {
     width: 300px;
     max-height: 500px;
   }
-  
+
   .notification-item {
     padding: 10px 16px;
   }
-  
+
   .panel-header,
   .panel-filters {
     padding: 12px 16px;
